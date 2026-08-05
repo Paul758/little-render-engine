@@ -79,14 +79,18 @@ float Vec3::length() const
 
 Vec3 Vec3::normalized() const 
 {
-    const float len = length();
+    const float lengthSquared = x * x + y * y + z * z;
 
-    if(len == 0.0f)
+    constexpr float epsilon = 1e-12f;
+
+    if(lengthSquared < epsilon)
     {
         throw std::runtime_error("Cannot normalize a zero-length vector");
     }
 
-    return *this / len;
+    const float inverseLength = 1.0f / std::sqrt(lengthSquared); 
+
+    return *this * inverseLength;
 }
 
 float Vec3::dot(const Vec3& a, const Vec3& b)
