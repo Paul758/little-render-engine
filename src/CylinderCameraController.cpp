@@ -8,6 +8,7 @@ void CylinderCameraController::activate(GLFWwindow* window, Camera& camera)
 {
     glfwSetCursorPosCallback(window, nullptr);
     camera_ = &camera;
+    camera.setProjectionMode(ProjectionMode::Orthographic);
     updateCameraPosition(camera);
 }
 

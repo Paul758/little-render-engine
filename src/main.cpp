@@ -16,6 +16,8 @@
 #include "FreeFlyCameraController.h"
 #include "CylinderCameraController.h"
 #include "CameraMode.h"
+#include "PixelFramebuffer.h"
+#include "OrbitCameraController.h"
 
 namespace
 {
@@ -83,6 +85,8 @@ int main()
     //enable depth testing
     glEnable(GL_DEPTH_TEST);
 
+    glDisable(GL_MULTISAMPLE);
+
     //Create Scene
     {
         Scene scene;
@@ -97,9 +101,8 @@ int main()
         //Camera camera;
         FreeFlyCameraController freeFlyController;
         CylinderCameraController cylinderController;
+        OrbitCameraController orbitCameraController;
 
-
-        CameraMode cameraMode = CameraMode::FreeFly;
         CameraController* activeController = &cylinderController;
 
         activeController -> activate(window, camera);
@@ -110,7 +113,9 @@ int main()
         scene.getGameObject(cubeB).addRenderComponent(cubeMesh, shaderProgram);
         scene.getGameObject(cubeC).addRenderComponent(cubeMesh, shaderProgram);
         Renderer renderer;
-    
+        
+        PixelFramebuffer pixelFramebuffer(640, 360);
+
         bool previousCPressed = false;
 
         float lastFrameTime = static_cast<float>(glfwGetTime());
@@ -130,7 +135,7 @@ int main()
             {
                 if (activeController == &freeFlyController)
                 {
-                    activeController = &cylinderController;
+                    activeController = &orbitCameraController;
                 }
 
                 else if (activeController == &cylinderController)
@@ -148,18 +153,37 @@ int main()
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
             }
 
+            //Pass 1: low resolution scene
+
+            pixelFramebuffer.bind();
+            glEnable(GL_DEPTH_TEST);
+
             glClearColor(0.08F, 0.10F, 0.14F, 1.0F);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
             float time = glfwGetTime();
             float sinTime = sin(time);
        
-            //scene.getGameObject(cube).getTransform().rotate({0.0f, time * 50.0f, 0.0f});
-            //scene.getGameObject(cube).getTransform().setPosition({sinTime, 0.0f, 0.0f});
+            scene.getGameObject(cube).getTransform().rotate({0.0f, time * 50.0f, 0.0f});
+            scene.getGameObject(cube).getTransform().setPosition({sinTime, 0.0f, 0.0f});
             scene.getGameObject(cubeB).getTransform().setPosition({4.0f, 0.0f, 3.0f});
-            scene.getGameObject(cubeC).getTransform().setPosition({-4.0f, 0.0f, 2.5f});
+            scene.getGameObject(cubeC).getTransform().setPosition({-4.0f, 0.0f, 2.0f});
+
             renderer.render(scene, camera);
 
+            //Pass 2: upscale to the window
+            PixelFramebuffer::unbind();
+
+            int windowFramebufferWidth = 0;
+            int windowFramebufferHeight = 0;
+
+            glfwGetFramebufferSize(window, &windowFramebufferWidth, &windowFramebufferHeight);
+
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, pixelFramebuffer.getId());
+
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+            glBlitFramebuffer(0, 0, pixelFramebuffer.getWidth(), pixelFramebuffer.getHeight(), 0, 0, windowFramebufferWidth, windowFramebufferHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
             glfwSwapBuffers(window);
             

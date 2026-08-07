@@ -15,7 +15,16 @@ Mat4 Camera::getViewMatrix() const
 
 Mat4 Camera::getProjectionMatrix() const
 {
-    return Mat4::perspective(Math::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
+    if (projectionMode_ == ProjectionMode::Perspective) 
+    {
+        return Mat4::perspective(Math::radians(fieldOfView_), aspectRatio_, nearPlane_, farPlane_);
+    }
+
+    const float halfHeight = orthographicSize_;
+    const float halfWidth = halfHeight *  aspectRatio_;
+
+    return Mat4::orthographic(-halfWidth, halfWidth, -halfHeight, halfHeight, nearPlane_, farPlane_);
+    
 }
 
 const Vec3& Camera::getPosition() const
@@ -36,4 +45,9 @@ void Camera::setTarget(const Vec3& newTarget)
 const Vec3& Camera::getTarget() const
 {
     return target_;
+}
+
+void Camera::setProjectionMode(ProjectionMode mode)
+{
+    projectionMode_ = mode;
 }

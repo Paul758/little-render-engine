@@ -9,6 +9,8 @@ void FreeFlyCameraController::activate(GLFWwindow* window, Camera& camera)
     camera_ = &camera;
     firstMouse_ = true;
 
+    camera.setProjectionMode(ProjectionMode::Perspective);
+
     glfwSetWindowUserPointer(window, this);
     glfwSetCursorPosCallback(window, FreeFlyCameraController::mousePositionCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

@@ -173,6 +173,31 @@ Mat4 Mat4::perspective(float fieldOfViewRadians, float aspectRatio, float nearPl
     return result;
 }
 
+Mat4 Mat4::orthographic(float left, float right, float bottom, float top, float nearPlane, float farPlane)
+{
+    if (right == left || top == bottom || farPlane == nearPlane)
+    {
+        throw std::invalid_argument("Invalid orthographic bounds");
+    }
+
+    Mat4 result = Mat4::identity();
+
+    result.at(0, 0) = 2.0f / (right - left);
+
+    result.at(1, 1) = 2.0f / (top - bottom);
+
+    result.at(2, 2) = -2.0f / (farPlane - nearPlane);
+
+    result.at(0,3) = -(right + left) / (right - left);
+
+    result.at(1, 3) = -(top + bottom) / (top - bottom);
+
+    result.at(2, 3) = -(farPlane + nearPlane) / (farPlane - nearPlane);
+
+    return result;
+}
+
+
 Mat4& Mat4::setRow(Mat4& result, size_t numRow, const Vec3& rowVec) 
 {
     result.at(numRow, 0) = rowVec.x;

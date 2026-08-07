@@ -54,9 +54,12 @@ add_executable(LittleRenderer
     src/Camera.cpp
     src/FreeFlyCameraController.cpp
     src/CylinderCameraController.cpp
+    src/OrbitCameraController.cpp
+    src/ProjectionMode.h
     src/Scene.cpp
     src/RenderComponent.h
 
+    src/PixelFramebuffer.cpp
 
     src/math/Mat4.cpp
     src/math/Vec3.cpp
