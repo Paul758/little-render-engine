@@ -65,6 +65,9 @@ add_executable(LittleRenderer
     src/math/Vec3.cpp
     src/math/MathUtils.h
 
+
+    src/PlayerController.cpp
+    src/Input.cpp;
 )
 
 add_custom_command(

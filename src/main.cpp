@@ -18,6 +18,7 @@
 #include "CameraMode.h"
 #include "PixelFramebuffer.h"
 #include "OrbitCameraController.h"
+#include "PlayerController.h"
 
 namespace
 {
@@ -114,6 +115,9 @@ int main()
         scene.getGameObject(cubeC).addRenderComponent(cubeMesh, shaderProgram);
         Renderer renderer;
         
+        PlayerController playerController(orbitCameraController);
+        Input input(window);
+
         PixelFramebuffer pixelFramebuffer(640, 360);
 
         bool previousCPressed = false;
@@ -161,13 +165,15 @@ int main()
             glClearColor(0.08F, 0.10F, 0.14F, 1.0F);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            float time = glfwGetTime();
-            float sinTime = sin(time);
+            //float time = glfwGetTime();
+            //float sinTime = sin(time);
        
-            scene.getGameObject(cube).getTransform().rotate({0.0f, time * 50.0f, 0.0f});
-            scene.getGameObject(cube).getTransform().setPosition({sinTime, 0.0f, 0.0f});
+            //scene.getGameObject(cube).getTransform().rotate({0.0f, time * 50.0f, 0.0f});
+            //scene.getGameObject(cube).getTransform().setPosition({sinTime, 0.0f, 0.0f});
             scene.getGameObject(cubeB).getTransform().setPosition({4.0f, 0.0f, 3.0f});
             scene.getGameObject(cubeC).getTransform().setPosition({-4.0f, 0.0f, 2.0f});
+
+            playerController.update(input, scene.getGameObject(cube), deltaTime);
 
             renderer.render(scene, camera);
 
