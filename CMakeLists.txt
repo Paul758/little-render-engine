@@ -40,6 +40,8 @@ add_executable(LittleRenderer
     
     src/graphics/Shader.cpp
     src/graphics/ShaderProgram.cpp
+    src/graphics/Texture2D.cpp
+    src/graphics/PixelSettings.h
 
     src/Mesh.cpp
     src/VertexBuffer.cpp
@@ -63,11 +65,17 @@ add_executable(LittleRenderer
 
     src/math/Mat4.cpp
     src/math/Vec3.cpp
+    src/math/Vec2.cpp
     src/math/MathUtils.h
-
 
     src/PlayerController.cpp
     src/Input.cpp;
+
+    src/grass/GrassType.h
+    src/grass/Terrain.cpp
+    src/grass/TerrainCell.h
+
+
 )
 
 add_custom_command(
@@ -83,7 +91,7 @@ target_link_libraries(LittleRenderer
         glfw
 )
 
-target_include_directories(LittleRenderer PRIVATE src)
+target_include_directories(LittleRenderer PRIVATE src external/stb)
 
 # Helpful warnings.
 if(MSVC)

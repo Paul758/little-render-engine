@@ -8,6 +8,11 @@ void Transform::setPosition(const Vec3& position)
     position_ = position;
 }
 
+Vec3 Transform::getPosition()
+{
+    return position_;
+}
+
 void Transform::translate(const Vec3& offset)
 {
     std::cout << "Add translation" << offset.x << "\n" << offset.y << "\n" << offset.z << "\n";

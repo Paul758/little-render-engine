@@ -66,7 +66,7 @@ void OrbitCameraController::updateCameraPosition(Camera& camera)
     camera.setPosition(target_ + offset);
     camera.setTarget(target_);
 
-
+    camera.updateBasisVectors();
 }
 
 void OrbitCameraController::updateCameraVectors()

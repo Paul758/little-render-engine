@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Renderer.h"
+#include "graphics/PixelSettings.h"
 
 GameObject& Renderer::addObject(GameObject&& gameObject)
 {
@@ -11,6 +12,8 @@ GameObject& Renderer::addObject(GameObject&& gameObject)
 
 void Renderer::render(Scene& scene, Camera& camera) const
 {
+    //const float worldUnitsPerPixel = (camera.getOrthographicSize() * 2.0f) / 360.0f;
+
     for (const GameObject& object : scene.getGameObjects())
     {
         const RenderComponent* renderComponent = object.getRenderComponent();
@@ -33,6 +36,12 @@ void Renderer::render(Scene& scene, Camera& camera) const
         shader -> setMat4("model", object.getTransform().getModelMatrix());
         shader -> setMat4("view", camera.getViewMatrix());
         shader -> setMat4("projection", camera.getProjectionMatrix());
+
+        //For grass
+        shader -> setVec3("cameraRight", camera.getRight());
+        shader -> setVec3("cameraUp", camera.getUp());
+        shader -> setFloat("spriteWidth", 16.0f * PixelSettings::worldUnitsPerPixel());
+        shader -> setFloat("spriteHeight", 16.0f * PixelSettings::worldUnitsPerPixel());
 
         mesh->draw();
     }

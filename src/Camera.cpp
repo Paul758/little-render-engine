@@ -27,6 +27,15 @@ Mat4 Camera::getProjectionMatrix() const
     
 }
 
+void Camera::updateBasisVectors()
+{
+    forward_ = (target_ - position_).normalized();
+    const Vec3 worldUp {0.0f, 1.0f, 0.0f};
+
+    right_ = Vec3::cross(forward_, worldUp).normalized();
+    up_ = Vec3::cross(right_, forward_).normalized();
+}
+
 const Vec3& Camera::getPosition() const
 {
     return position_;
@@ -50,4 +59,24 @@ const Vec3& Camera::getTarget() const
 void Camera::setProjectionMode(ProjectionMode mode)
 {
     projectionMode_ = mode;
+}
+
+const Vec3& Camera::getForward() const
+{
+    return forward_;
+}
+
+const Vec3& Camera::getRight() const
+{
+    return right_;
+}
+
+const Vec3& Camera::getUp() const
+{
+    return up_;
+}
+
+float Camera::getOrthographicSize() const
+{
+    return orthographicSize_;
 }

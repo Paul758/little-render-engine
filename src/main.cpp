@@ -19,6 +19,8 @@
 #include "PixelFramebuffer.h"
 #include "OrbitCameraController.h"
 #include "PlayerController.h"
+#include "grass/Terrain.h"
+#include "graphics/Texture2D.h"
 
 namespace
 {
@@ -47,8 +49,8 @@ int main()
 
 
     GLFWwindow* window = glfwCreateWindow(
-        1280,
-        720,
+        1920,
+        1080,
         "Little Renderer",
         nullptr,
         nullptr
@@ -95,8 +97,8 @@ int main()
         GameObjectID cubeB = scene.createGameObject();
         GameObjectID cubeC = scene.createGameObject();
 
-        ShaderProgram shaderProgram("assets/shaders/basic.vert", "assets/shaders/basic.frag");
-        //shaderProgram.use();
+        ShaderProgram terrainShader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
+        ShaderProgram grassShader("assets/shaders/grass.vert", "assets/shaders/grass.frag");
 
         Camera camera(Vec3{0.0f, 3.0f, 5.0f});
         //Camera camera;
@@ -110,15 +112,31 @@ int main()
 
         MeshData cubeData {PrimitiveMesh::getCubeVertices(), PrimitiveMesh::getCubeIndices()};
         Mesh cubeMesh{cubeData};
-        scene.getGameObject(cube).addRenderComponent(cubeMesh, shaderProgram);
-        scene.getGameObject(cubeB).addRenderComponent(cubeMesh, shaderProgram);
-        scene.getGameObject(cubeC).addRenderComponent(cubeMesh, shaderProgram);
+        scene.getGameObject(cube).addRenderComponent(cubeMesh, terrainShader);
+        scene.getGameObject(cubeB).addRenderComponent(cubeMesh, terrainShader);
+        scene.getGameObject(cubeC).addRenderComponent(cubeMesh, terrainShader);
         Renderer renderer;
         
         PlayerController playerController(orbitCameraController);
         Input input(window);
 
         PixelFramebuffer pixelFramebuffer(640, 360);
+
+        //Create Terrain
+        Terrain terrain(512, 512, 0.2f);
+        terrain.generateTerrain();
+        MeshData terrainData = terrain.createMeshData();
+        Mesh terrainMesh{terrainData};
+        GameObjectID terrainObject = scene.createGameObject();
+        scene.getGameObject(terrainObject).addRenderComponent(terrainMesh, terrainShader);
+
+        //Create Grass
+        Texture2D grassTexture("assets/textures/grass-small-0.png");
+        grassTexture.bind(0);
+        MeshData grassData = terrain.createGrassMeshData();
+        Mesh grassMesh{grassData};
+        GameObjectID grassObject = scene.createGameObject();
+        scene.getGameObject(grassObject).addRenderComponent(grassMesh, grassShader);
 
         bool previousCPressed = false;
 
@@ -170,6 +188,8 @@ int main()
        
             //scene.getGameObject(cube).getTransform().rotate({0.0f, time * 50.0f, 0.0f});
             //scene.getGameObject(cube).getTransform().setPosition({sinTime, 0.0f, 0.0f});
+            Vec3 cubePosition = scene.getGameObject(cube).getTransform().getPosition();
+            scene.getGameObject(cube).getTransform().setPosition({cubePosition.x, 0.5f, cubePosition.z});
             scene.getGameObject(cubeB).getTransform().setPosition({4.0f, 0.0f, 3.0f});
             scene.getGameObject(cubeC).getTransform().setPosition({-4.0f, 0.0f, 2.0f});
 

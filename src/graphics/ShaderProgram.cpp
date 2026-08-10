@@ -75,6 +75,46 @@ void ShaderProgram::setMat4(const std::string& name, const Mat4& matrix) const
     glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data());
 }
 
+void ShaderProgram::setInt(const std::string& name, int value) const
+{
+    const GLint location = glGetUniformLocation(programID, name.c_str());
+
+    if(location == -1)
+    {
+        std::cerr << "Uniform not found: " << name << '\n';
+        return;
+    }
+
+    glUniform1i(location, value);
+}
+
+void ShaderProgram::setFloat(const std::string& name, float value) const
+{
+    const GLint location = glGetUniformLocation(programID, name.c_str());
+
+    if(location == -1)
+    {
+        std::cerr << "Uniform not found: " << name << '\n';
+        return;
+    }
+
+    glUniform1f(location, value);
+}
+
+
+void ShaderProgram::setVec3(const std::string& name, const Vec3& vector) const
+{
+    const GLint location = glGetUniformLocation(programID, name.c_str());
+
+    if(location == -1)
+    {
+        std::cerr << "Uniform not found: " << name << '\n';
+        return;
+    }
+
+    glUniform3f(location, vector.x, vector.y, vector.z);
+}
+
 GLuint ShaderProgram::getID() const {
     return programID;
 }

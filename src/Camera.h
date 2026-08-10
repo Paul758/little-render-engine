@@ -3,6 +3,7 @@
 #include "math/Mat4.h"
 #include "math/Vec3.h"
 #include "ProjectionMode.h"
+#include "graphics/PixelSettings.h"
 
 class Camera
 {
@@ -18,7 +19,10 @@ private:
     float nearPlane_ = 0.1f;
     float farPlane_ = 100.0f;
 
-    float orthographicSize_ = 8.0f;
+    float orthographicSize_ = PixelSettings::orthographicSize();
+
+    Vec3 forward_ {0.0f, 0.0f, -1.0f};
+    Vec3 right_ {1.0f, 0.0f, 0.0f};
 
 public:
     explicit Camera(Vec3 position);
@@ -34,4 +38,12 @@ public:
 
     const Vec3& getTarget() const;
     void setTarget(const Vec3& target);
+
+    void updateBasisVectors();
+
+    const Vec3& getForward() const;
+    const Vec3& getRight() const;
+    const Vec3& getUp() const;
+
+    float getOrthographicSize() const;
 };

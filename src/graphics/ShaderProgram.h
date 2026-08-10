@@ -25,6 +25,9 @@ public:
     void use() const;
     
     void setMat4(const std::string& name, const Mat4& matrix) const;
+    void setInt(const std::string& name, int value) const;
+    void setFloat(const std::string& name, float value) const;
+    void setVec3(const std::string& name, const Vec3& vector) const;
 
     GLuint getID() const;
 

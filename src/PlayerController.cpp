@@ -12,6 +12,7 @@ void PlayerController::update(Input& input, GameObject& gameObject, float deltaT
     forward_ = cameraController_.getForward();
     right_ = cameraController_.getRight();
     
+    
 
     if(input.isKeyPressed(GLFW_KEY_W)) 
     {

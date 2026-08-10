@@ -20,4 +20,6 @@ public:
     void rotate(const Vec3& rotation);
 
     Mat4 getModelMatrix() const;
+
+    Vec3 getPosition();
 };
