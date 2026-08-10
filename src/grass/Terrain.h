@@ -22,6 +22,7 @@ public:
     float samplePatchValue(std::size_t x, std::size_t z) const;
     float randomValue(int x, int z) const;
     float sampleNoise(float x, float z) const;
+    float sampleGrassField(float x, float z, float offsetX, float offsetZ) const;
     bool hasDifferentNeighbor(std::size_t x, std::size_t z) const;
     MeshData createGrassMeshData() const;
 

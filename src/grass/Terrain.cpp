@@ -25,13 +25,18 @@ void Terrain::generateTerrain()
     {
         for (std::size_t x = 0; x < width_; ++x)
         {
-            const float value = samplePatchValue(x, z);
+            const float fx = static_cast<float>(x);
+            const float fz = static_cast<float>(z);
 
-            if (value < 0.35f)
+            const float dark = sampleGrassField(fx, fz, 0.0f, 0.0f);
+            const float medium = sampleGrassField(fx, fz, 37.0f, 71.0f) + 0.08f;
+            const float light = sampleGrassField(fx, fz, 113.0f, 191.0f);
+
+            if (dark > medium && dark > light)
             {
                 getCell(x, z).grassType = GrassType::Dark;
             }
-            else if (value < 0.65f)
+            else if (medium > light)
             {
                 getCell(x, z).grassType = GrassType::Medium;
             }
@@ -121,6 +126,19 @@ float Terrain::randomValue(int x, int z) const
     hash ^= hash >> 16u;
 
     return static_cast<float>(hash) / static_cast<float>(UINT_MAX);
+}
+
+float Terrain::sampleGrassField(float x, float z, float offsetX, float offsetZ) const
+{
+    float value = 0.0f;
+
+    value += sampleNoise(x * 0.05f + offsetX, z * 0.04f + offsetZ) * 0.8f;
+
+    value += sampleNoise(x * 0.08f + offsetX, z * 0.08f + offsetZ) * 0.2f;
+
+    //value += sampleNoise(x * 0.25f + offsetX, z * 0.25f + offsetZ) * 0.1f;
+
+    return value;
 }
 
 float Terrain::lerp(float a, float b, float t)
@@ -286,3 +304,4 @@ void Terrain::addGrassQuad(MeshData& data, const Vec3& center, const Vec3& color
     data.indices.push_back(baseIndex + 2);
     data.indices.push_back(baseIndex + 3);
 }
+
