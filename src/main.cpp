@@ -97,8 +97,11 @@ int main()
         GameObjectID cubeB = scene.createGameObject();
         GameObjectID cubeC = scene.createGameObject();
 
-        ShaderProgram terrainShader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
+        ShaderProgram basicShader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
         ShaderProgram grassShader("assets/shaders/grass.vert", "assets/shaders/grass.frag");
+        ShaderProgram terrainShader("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
+        ShaderProgram cleanUpShader("assets/shaders/postprocess.vert", "assets/shaders/pixel_cleanup.frag");
+
 
         Camera camera(Vec3{0.0f, 3.0f, 5.0f});
         //Camera camera;
@@ -112,15 +115,49 @@ int main()
 
         MeshData cubeData {PrimitiveMesh::getCubeVertices(), PrimitiveMesh::getCubeIndices()};
         Mesh cubeMesh{cubeData};
-        scene.getGameObject(cube).addRenderComponent(cubeMesh, terrainShader);
-        scene.getGameObject(cubeB).addRenderComponent(cubeMesh, terrainShader);
-        scene.getGameObject(cubeC).addRenderComponent(cubeMesh, terrainShader);
+        scene.getGameObject(cube).addRenderComponent(cubeMesh, basicShader);
+        scene.getGameObject(cubeB).addRenderComponent(cubeMesh, basicShader);
+        scene.getGameObject(cubeC).addRenderComponent(cubeMesh, basicShader);
         Renderer renderer;
         
         PlayerController playerController(orbitCameraController);
         Input input(window);
-
+        
+        //Pixel screen
         PixelFramebuffer pixelFramebuffer(640, 360);
+        float screenVertices[] = {
+            -1.0f, -1.0f,   0.0f, 0.0f,
+             1.0f, -1.0f,   1.0f, 0.0f,
+             1.0f, 1.0f,    1.0f, 1.0f,
+            -1.0f, 1.0f,    0.0f, 1.0f
+        };
+
+        unsigned int screenIndices[] = {
+            0, 1, 2,
+            0, 2, 3
+        };
+
+        GLuint screenVAO;
+        GLuint screenVBO;
+        GLuint screenEBO;
+
+        glGenVertexArrays(1, &screenVAO);
+        glGenBuffers(1, &screenVBO);
+        glGenBuffers(1, &screenEBO);
+
+        glBindVertexArray(screenVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(screenVertices), screenVertices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, screenEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(screenIndices), screenIndices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(0));
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(2 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        glBindVertexArray(0);
 
         //Create Terrain
         Terrain terrain(512, 512, 0.2f);
@@ -195,6 +232,9 @@ int main()
 
             playerController.update(input, scene.getGameObject(cube), deltaTime);
 
+            grassTexture.bind(0);
+            grassShader.use();
+            grassShader.setInt("grassTexture", 0);
             renderer.render(scene, camera);
 
             //Pass 2: upscale to the window
@@ -205,12 +245,22 @@ int main()
 
             glfwGetFramebufferSize(window, &windowFramebufferWidth, &windowFramebufferHeight);
 
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, pixelFramebuffer.getId());
+            glViewport(0, 0, windowFramebufferWidth, windowFramebufferHeight);
+            glDisable(GL_DEPTH_TEST);
+            cleanUpShader.use();
 
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, pixelFramebuffer.getColorTexture());
 
-            glBlitFramebuffer(0, 0, pixelFramebuffer.getWidth(), pixelFramebuffer.getHeight(), 0, 0, windowFramebufferWidth, windowFramebufferHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            cleanUpShader.setInt("screenTexture", 0);
+            cleanUpShader.setVec2("texelSize", {1.0f / static_cast<float>(pixelFramebuffer.getWidth()), 1.0f / static_cast<float>(pixelFramebuffer.getHeight())});
 
+            glBindVertexArray(screenVAO);
+
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+            glBindVertexArray(0);
+        
             glfwSwapBuffers(window);
             
         }

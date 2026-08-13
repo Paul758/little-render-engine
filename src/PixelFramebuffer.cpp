@@ -85,7 +85,12 @@ GLuint PixelFramebuffer::getId() const
     return framebuffer_;
 }
 
-PixelFramebuffer::PixelFramebuffer(PixelFramebuffer&& other) noexcept : framebuffer_(std::exchange(other.framebuffer_, 0))
+PixelFramebuffer::PixelFramebuffer(PixelFramebuffer&& other) noexcept : 
+    framebuffer_(std::exchange(other.framebuffer_, 0)),
+    colorTexture_(std::exchange(other.colorTexture_, 0)),
+    depthBuffer_(std::exchange(other.depthBuffer_, 0)),
+    width_(std::exchange(other.width_, 0)),
+    height_(std::exchange(other.height_, 0))
 {
 }
 
@@ -93,12 +98,24 @@ PixelFramebuffer& PixelFramebuffer::operator=(PixelFramebuffer&& other) noexcept
 {
     if(this != &other)
     {
+        if (depthBuffer_ != 0)
+        {
+            glDeleteRenderbuffers(1, &depthBuffer_);
+        }
+        if (colorTexture_ != 0)
+        {
+            glDeleteTextures(1, &colorTexture_);
+        }
         if(framebuffer_ != 0)
         {
-            glDeleteBuffers(1, &framebuffer_);
+            glDeleteFramebuffers(1, &framebuffer_);
         }
 
         framebuffer_ = std::exchange(other.framebuffer_, 0);
+        colorTexture_ = std::exchange(other.colorTexture_, 0);
+        depthBuffer_ = std::exchange(other.depthBuffer_, 0);
+        width_ = std::exchange(other.width_, 0);
+        height_ = std::exchange(other.height_, 0);
     }
 
     return *this;

@@ -4,6 +4,7 @@
 #include "graphics/Shader.h"
 #include "graphics/ShaderProgram.h"
 #include "math/Mat4.h"
+#include <math/Vec2.h>
 
 ShaderProgram::ShaderProgram(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) 
 {
@@ -113,6 +114,19 @@ void ShaderProgram::setVec3(const std::string& name, const Vec3& vector) const
     }
 
     glUniform3f(location, vector.x, vector.y, vector.z);
+}
+
+void ShaderProgram::setVec2(const std::string& name, const Vec2& vector) const
+{
+    const GLint location = glGetUniformLocation(programID, name.c_str());
+
+    if(location == -1)
+    {
+        std::cerr << "Uniform not found: " << name << '\n';
+        return;
+    }
+
+    glUniform2f(location, vector.x, vector.y);
 }
 
 GLuint ShaderProgram::getID() const {

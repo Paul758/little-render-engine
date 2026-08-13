@@ -78,8 +78,8 @@ MeshData Terrain::createMeshData() const
         {
             const TerrainCell& cell = getCell(x, z);
 
-            const Vec3 color = getGrassColor(cell.grassType);
-
+            //const Vec3 color = getGrassColor(cell.grassType);
+            const Vec3 unusedColor{1.0f, 1.0f, 1.0f};
             
             const float worldX = startX + static_cast<float>(x) * cellSize_;
             const float worldZ = startZ + static_cast<float>(z) * cellSize_;
@@ -91,10 +91,10 @@ MeshData Terrain::createMeshData() const
 
             const GLuint baseIndex = static_cast<GLuint> (data.vertices.size());
 
-            data.vertices.push_back({p0, color});
-            data.vertices.push_back({p1, color});
-            data.vertices.push_back({p2, color});
-            data.vertices.push_back({p3, color});
+            data.vertices.push_back({p0, unusedColor});
+            data.vertices.push_back({p1, unusedColor});
+            data.vertices.push_back({p2, unusedColor});
+            data.vertices.push_back({p3, unusedColor});
 
             data.indices.push_back({baseIndex + 0});
             data.indices.push_back({baseIndex + 1});
@@ -107,6 +107,30 @@ MeshData Terrain::createMeshData() const
         }
     }
     return data;
+}
+
+GrassType Terrain::getGrassTypeAt(float worldX, float worldZ) const
+{
+    const Vec2 position{worldX, worldZ};
+
+    const float dark = sampleGrassField(position.x, position.y, 0.0f, 0.0f);
+
+    const float medium = sampleGrassField(position.x, position.y, 37.0f, 71.0f);// + 0.08;
+
+    const float light = sampleGrassField(position.x, position.y, 113.0f, 191.0f);
+
+    if (dark > medium && dark > light) 
+    {
+        return GrassType::Dark;
+    }
+    else if (medium > light)
+    {
+        return GrassType::Medium;
+    }
+    else
+    {
+        return GrassType::Light;
+    }
 }
 
 float Terrain::samplePatchValue(std::size_t x, std::size_t z) const
@@ -132,11 +156,10 @@ float Terrain::sampleGrassField(float x, float z, float offsetX, float offsetZ) 
 {
     float value = 0.0f;
 
-    value += sampleNoise(x * 0.05f + offsetX, z * 0.04f + offsetZ) * 0.8f;
+    value += sampleNoise(x * 0.33f + offsetX, z * 0.33f + offsetZ) * 0.8f;
 
-    value += sampleNoise(x * 0.08f + offsetX, z * 0.08f + offsetZ) * 0.2f;
+    value += sampleNoise(x * 0.5f + offsetX, z * 0.5f + offsetZ) * 0.2f;
 
-    //value += sampleNoise(x * 0.25f + offsetX, z * 0.25f + offsetZ) * 0.1f;
 
     return value;
 }
@@ -204,86 +227,78 @@ MeshData Terrain::createGrassMeshData() const
     const float startX = -terrainWidth * 0.5f;
     const float startZ = -terrainDepth * 0.5f;
 
-    for (std::size_t z = 0; z < height_; ++z)
+    constexpr float sampleSpacing = 0.1f;
+    constexpr float placementProbability = 0.15f;
+
+    for (float z = startZ; z < startZ + terrainDepth - sampleSpacing; z += sampleSpacing)
     {
-        for (std::size_t x = 0; x < width_; ++x)
+        for (float x = startX; x < startX + terrainWidth - sampleSpacing; x += sampleSpacing)
         {
-            const GrassType current = getCell(x, z).grassType;
+            const int sampleX = static_cast<int>((x - startX) / sampleSpacing);
+            const int sampleZ = static_cast<int>((z - startZ) / sampleSpacing);
 
-            const float worldX = startX + static_cast<float>(x) * cellSize_;
-            const float worldZ = startZ + static_cast<float>(z) * cellSize_;
+            const GrassType here = getGrassTypeAt(x, z);
+            const GrassType right = getGrassTypeAt(x + sampleSpacing, z);
+            const GrassType forward = getGrassTypeAt(x, z + sampleSpacing);
 
-            if (x + 1 < width_)
+            if (here != right)
             {
-                const GrassType right = getCell(x + 1, z).grassType;
+                const float chance = randomValue(sampleX + 700, sampleZ + 900);
 
-                if (current != right)
+                if (chance < placementProbability)
                 {
+                    Vec3 edgeCenter{x + sampleSpacing * 0.5f, 0.0f, z};
+
+                    constexpr float sideOffset = 0.05f;
+                    constexpr float maxJitter = 0.0f;
+
+                    Vec3 hereCenter = edgeCenter;
+                    Vec3 rightCenter = edgeCenter;
+
+                    hereCenter.x -= sideOffset;
+                    rightCenter.x += sideOffset;
+
+                    const float jitterA = randomValue(sampleX + 1200, sampleZ + 1400) * 2.0f - 1.0f;
+                    const float jitterB = randomValue(sampleX + 1500, sampleZ + 1600) * 2.0f - 1.0f;
                     
-                    const float placementChance = randomValue(static_cast<int>(x) + 700, static_cast<int>(z) + 900);
+                    hereCenter.z += jitterA * maxJitter * sampleSpacing;
+                    rightCenter.z += jitterB * maxJitter * sampleSpacing;
 
-                    if (placementChance < 0.3f)
-                    {
-                        Vec3 edgeCenter{worldX + cellSize_, 0.0f, worldZ + cellSize_ * 0.5f};
-                        constexpr float sideOffset = 0.08f;
-
-                        Vec3 currentCenter = edgeCenter;
-                        Vec3 rightCenter = edgeCenter;
-
-                        currentCenter.x -= sideOffset;
-                        rightCenter.x += sideOffset;
-
-                        const float jitterA = randomValue(static_cast<int>(x) + 1200, static_cast<int>(z) + 1400) * 2.0f - 1.0f;
-                        const float jitterB = randomValue(static_cast<int>(x) + 1500, static_cast<int>(z) + 1600) * 2.0f - 1.0f;
-
-                        constexpr float maxJitter = 0.3f;
-
-                        currentCenter.z += jitterA * maxJitter * cellSize_;
-                        rightCenter.z += jitterB * maxJitter * cellSize_;
-                        
-                        addGrassQuad(data, currentCenter, getGrassColor(current));
-                        addGrassQuad(data, rightCenter, getGrassColor(right));
-                    }
+                    addGrassQuad(data, hereCenter, getGrassColor(here));
+                    addGrassQuad(data, rightCenter, getGrassColor(right));
                 }
             }
 
-            if (z + 1 < height_)
+            if (here != forward)
             {
-                const GrassType forward = getCell(x, z + 1).grassType;
+                const float chance = randomValue(sampleX + 1700, sampleZ + 1900);
 
-                if (current != forward)
+                if (chance < placementProbability)
                 {
-                    const float placementChance = randomValue(static_cast<int>(x) + 1700, static_cast<int>(z) + 1900);
+                    Vec3 edgeCenter{x, 0.0f, z + sampleSpacing * 0.5f};
 
-                    if (placementChance < 0.3f)
-                    {
-                        Vec3 edgeCenter{worldX + cellSize_ * 0.5f, 0.0f, worldZ + cellSize_};
+                    constexpr float sideOffset = 0.05f;
+                    constexpr float maxJitter = 0.0f;
 
-                        constexpr float sideOffset = 0.08f;
+                    Vec3 hereCenter = edgeCenter;
+                    Vec3 forwardCenter = edgeCenter;
 
-                        Vec3 currentCenter = edgeCenter;
-                        Vec3 forwardCenter = edgeCenter;
+                    hereCenter.z -= sideOffset;
+                    forwardCenter.z += sideOffset;
 
-                        currentCenter.z -= sideOffset;
-                        forwardCenter.z += sideOffset;
+                    const float jitterA = randomValue(sampleX + 2200, sampleZ + 2400) * 2.0f - 1.0f;
+                    const float jitterB = randomValue(sampleX + 2500, sampleZ + 2700) * 2.0f - 1.0f;
+                    
+                    hereCenter.x += jitterA * maxJitter * sampleSpacing;
+                    forwardCenter.x += jitterB * maxJitter * sampleSpacing;
 
-                        const float jitterA = randomValue(static_cast<int>(x) + 2200, static_cast<int>(z) + 2400) * 2.0f - 1.0f;
-                        const float jitterB = randomValue(static_cast<int>(x) + 2500, static_cast<int>(z) + 2700) * 2.0f - 1.0f;
-
-                        constexpr float maxJitter = 0.3f;
-
-                        currentCenter.x += jitterA * maxJitter * cellSize_;
-                        forwardCenter.x += jitterB * maxJitter * cellSize_;
-
-                        addGrassQuad(data, currentCenter, getGrassColor(current));
-                        addGrassQuad(data, forwardCenter, getGrassColor(forward));
-                    }
-                }
-            }    
-            
-
+                    addGrassQuad(data, hereCenter, getGrassColor(here));
+                    addGrassQuad(data, forwardCenter, getGrassColor(forward));
+                }  
+            }
         }
     }
+
     return data;
 }
 
