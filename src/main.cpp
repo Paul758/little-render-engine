@@ -21,7 +21,9 @@
 #include "PlayerController.h"
 #include "grass/Terrain.h"
 #include "graphics/Texture2D.h"
-
+#include "graphics/BasicMaterial.h"
+#include "graphics/GrassMaterial.h"
+#include "graphics/TerrainMaterial.h"
 namespace
 {
 void framebuffer_size_callback(
@@ -97,14 +99,20 @@ int main()
         GameObjectID cubeB = scene.createGameObject();
         GameObjectID cubeC = scene.createGameObject();
 
+        //Texture
+        Texture2D grassTexture("assets/textures/grass-small-0.png");
+        grassTexture.bind(0);
+
         ShaderProgram basicShader("assets/shaders/basic.vert", "assets/shaders/basic.frag");
         ShaderProgram grassShader("assets/shaders/grass.vert", "assets/shaders/grass.frag");
         ShaderProgram terrainShader("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
         ShaderProgram cleanUpShader("assets/shaders/postprocess.vert", "assets/shaders/pixel_cleanup.frag");
 
+        BasicMaterial basicMaterial(basicShader);
+        GrassMaterial grassMaterial(grassShader, grassTexture);
+        TerrainMaterial terrainMaterial(terrainShader);
 
         Camera camera(Vec3{0.0f, 3.0f, 5.0f});
-        //Camera camera;
         FreeFlyCameraController freeFlyController;
         CylinderCameraController cylinderController;
         OrbitCameraController orbitCameraController;
@@ -115,9 +123,9 @@ int main()
 
         MeshData cubeData {PrimitiveMesh::getCubeVertices(), PrimitiveMesh::getCubeIndices()};
         Mesh cubeMesh{cubeData};
-        scene.getGameObject(cube).addRenderComponent(cubeMesh, basicShader);
-        scene.getGameObject(cubeB).addRenderComponent(cubeMesh, basicShader);
-        scene.getGameObject(cubeC).addRenderComponent(cubeMesh, basicShader);
+        scene.getGameObject(cube).addRenderComponent(cubeMesh, basicMaterial);
+        scene.getGameObject(cubeB).addRenderComponent(cubeMesh, basicMaterial);
+        scene.getGameObject(cubeC).addRenderComponent(cubeMesh, basicMaterial);
         Renderer renderer;
         
         PlayerController playerController(orbitCameraController);
@@ -165,15 +173,14 @@ int main()
         MeshData terrainData = terrain.createMeshData();
         Mesh terrainMesh{terrainData};
         GameObjectID terrainObject = scene.createGameObject();
-        scene.getGameObject(terrainObject).addRenderComponent(terrainMesh, terrainShader);
+        scene.getGameObject(terrainObject).addRenderComponent(terrainMesh, terrainMaterial);
 
         //Create Grass
-        Texture2D grassTexture("assets/textures/grass-small-0.png");
-        grassTexture.bind(0);
+        
         MeshData grassData = terrain.createGrassMeshData();
         Mesh grassMesh{grassData};
         GameObjectID grassObject = scene.createGameObject();
-        scene.getGameObject(grassObject).addRenderComponent(grassMesh, grassShader);
+        scene.getGameObject(grassObject).addRenderComponent(grassMesh, grassMaterial);
 
         bool previousCPressed = false;
 

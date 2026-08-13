@@ -10,9 +10,9 @@ const Transform& GameObject::getTransform() const
     return transform_;
 }
 
-RenderComponent& GameObject::addRenderComponent(const Mesh& mesh, const ShaderProgram& shader)
+RenderComponent& GameObject::addRenderComponent(const Mesh& mesh, const Material& material)
 {
-   return renderComponent_.emplace(RenderComponent{&mesh, &shader});
+   return renderComponent_.emplace(RenderComponent{&mesh, &material});
 }
 
 const RenderComponent* GameObject::getRenderComponent() const

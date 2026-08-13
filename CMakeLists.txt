@@ -43,6 +43,10 @@ add_executable(LittleRenderer
     src/graphics/Texture2D.cpp
     src/graphics/PixelSettings.h
 
+    src/graphics/BasicMaterial.cpp
+    src/graphics/GrassMaterial.cpp
+    src/graphics/TerrainMaterial.cpp
+
     src/Mesh.cpp
     src/VertexBuffer.cpp
     src/VertexArray.cpp

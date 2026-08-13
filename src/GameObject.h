@@ -24,7 +24,7 @@ public:
     Transform& getTransform();
     const Transform& getTransform() const;
 
-    RenderComponent& addRenderComponent(const Mesh& mesh, const ShaderProgram& shaderProgram);
+    RenderComponent& addRenderComponent(const Mesh& mesh, const Material& material);
     const RenderComponent* getRenderComponent() const;
     RenderComponent* getRenderComponent();
 
