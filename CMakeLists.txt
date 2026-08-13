@@ -66,6 +66,7 @@ add_executable(LittleRenderer
     src/RenderComponent.h
 
     src/PixelFramebuffer.cpp
+    src/PixelRenderer.cpp
 
     src/math/Mat4.cpp
     src/math/Vec3.cpp

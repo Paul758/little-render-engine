@@ -60,3 +60,41 @@ std::vector<GLuint> PrimitiveMesh::getCubeIndices()
         20, 21, 22,  20, 22, 23   // Top
     };
 }
+
+std::vector<Vertex> PrimitiveMesh::getQuadVertices()
+{
+    return {
+        {
+            {-1.0f, -1.0f, 0.0f},
+            {1.0f, 1.0f, 1.0f},
+            {0.0f, 0.0f},
+            {0.0f, 0.0f}
+        },
+        {
+            {1.0f, -1.0f, 0.0f},
+            {1.0f, 1.0f, 1.0f},
+            {1.0f, 0.0f},
+            {0.0f, 0.0f}
+        },
+        {
+            {1.0f, 1.0f, 0.0f},
+            {1.0f, 1.0f, 1.0f},
+            {1.0f, 1.0f},
+            {0.0f, 0.0f}
+        },
+        {
+            {-1.0f, 1.0f, 0.0f},
+            {1.0f, 1.0f, 1.0f},
+            {0.0f, 1.0f},
+            {0.0f, 0.0f}
+        }
+    };
+}
+
+std::vector<GLuint> PrimitiveMesh::getQuadIndices()
+{
+    return {
+        0, 1, 2,
+        0, 2, 3
+    };
+}
