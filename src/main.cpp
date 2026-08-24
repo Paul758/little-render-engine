@@ -203,7 +203,6 @@ int main()
 
             pixelRenderer.beginFrame();
             renderer.render(scene, camera);
-
             pixelRenderer.present(window);
         
             glfwSwapBuffers(window);
