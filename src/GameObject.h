@@ -5,7 +5,7 @@
 #include "Transform.h"
 #include "Mesh.h"
 #include "graphics/ShaderProgram.h"
-#include "RenderComponent.h"
+#include "components/RenderComponent.h"
 
 class GameObject
 {

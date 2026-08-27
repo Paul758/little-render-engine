@@ -25,7 +25,7 @@
 #include "graphics/GrassMaterial.h"
 #include "graphics/TerrainMaterial.h"
 #include "PixelRenderer.h"
-
+#include "GameTime.h"
 namespace
 {
 void framebuffer_size_callback(
@@ -153,16 +153,14 @@ int main()
 
         bool previousCPressed = false;
 
-        float lastFrameTime = static_cast<float>(glfwGetTime());
+        GameTime time;
 
         //Main loop
         while (glfwWindowShouldClose(window) == GLFW_FALSE)
         {
             glfwPollEvents();
 
-            const float currentTime = static_cast<float>(glfwGetTime());
-            const float deltaTime = currentTime - lastFrameTime;
-            lastFrameTime = currentTime;
+            time.update();
 
             const bool cPressed = glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS;
 
@@ -181,7 +179,7 @@ int main()
                 activeController -> activate(window, camera);
             }
             previousCPressed = cPressed;
-            activeController -> update(window, camera, deltaTime);
+            activeController -> update(window, camera, time.deltaTime());
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
@@ -199,7 +197,7 @@ int main()
             scene.getGameObject(cubeB).getTransform().setPosition({4.0f, 0.0f, 3.0f});
             scene.getGameObject(cubeC).getTransform().setPosition({-4.0f, 0.0f, 2.0f});
 
-            playerController.update(input, scene.getGameObject(cube), deltaTime);
+            playerController.update(input, scene.getGameObject(cube), time.deltaTime());
 
             pixelRenderer.beginFrame();
             renderer.render(scene, camera);

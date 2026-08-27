@@ -63,7 +63,7 @@ add_executable(LittleRenderer
     src/OrbitCameraController.cpp
     src/ProjectionMode.h
     src/Scene.cpp
-    src/RenderComponent.h
+
 
     src/PixelFramebuffer.cpp
     src/PixelRenderer.cpp
@@ -80,7 +80,14 @@ add_executable(LittleRenderer
     src/grass/Terrain.cpp
     src/grass/TerrainCell.h
 
+    src/components/TransformComponent.cpp
+    src/components/RenderComponent.h
 
+    src/ecs/ComponentPool.h
+    src/ecs/ComponentRegistry.h
+    src/ecs/EntityManager.cpp
+
+    src/GameTime.cpp
 )
 
 add_custom_command(
