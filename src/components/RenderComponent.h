@@ -1,6 +1,6 @@
 #include "Mesh.h"
 #include "graphics/ShaderProgram.h"
-#include "graphics/Material.h"
+#include "graphics/materials/Material.h"
 
 struct RenderComponent
 {

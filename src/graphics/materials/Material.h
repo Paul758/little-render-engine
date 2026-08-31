@@ -1,5 +1,7 @@
 #pragma once
 
+#include "graphics/RenderContext.h"
+
 class Camera;
 class ShaderProgram;
 class GameObject;
@@ -11,6 +13,6 @@ public:
 
     virtual const ShaderProgram& getShader() const = 0;
 
-    virtual void apply(const Camera& camera, const GameObject& object) const = 0;
+    virtual void apply(const RenderContext& renderContext) const = 0;
 
 };

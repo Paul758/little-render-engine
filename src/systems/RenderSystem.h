@@ -1,12 +1,14 @@
 #pragma once
-#include <ComponentRegistry.h>
+#include "ecs/ComponentRegistry.h"
+
+#include "graphics/Renderview.h"
 
 class RenderSystem
 {
 public:
-    RenderSystem(ComponentRegistry registry);
-    void update();
+    RenderSystem(ComponentRegistry& registry);
+    void render(const RenderView& view);
 
 private:
-    ComponentRegistry registry_;
+    ComponentRegistry& registry_;
 };

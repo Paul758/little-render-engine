@@ -2,7 +2,7 @@
 
 #include "graphics/ShaderProgram.h"
 #include "Camera.h"
-#include "graphics/Material.h"
+#include "graphics/materials/Material.h"
 #include "graphics/Texture2D.h"
 
 class GrassMaterial : public Material
@@ -16,5 +16,5 @@ public:
 
     const ShaderProgram& getShader() const;
 
-    void apply(const Camera& camera, const GameObject& gameObject) const override;
+    void apply(const RenderContext& renderContext) const override;
 };

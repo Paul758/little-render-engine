@@ -63,9 +63,9 @@ add_library(LittleRendererCore
     src/graphics/Texture2D.cpp
     src/graphics/PixelSettings.h
 
-    src/graphics/BasicMaterial.cpp
-    src/graphics/GrassMaterial.cpp
-    src/graphics/TerrainMaterial.cpp
+    src/graphics/materials/BasicMaterial.cpp
+    src/graphics/materials/GrassMaterial.cpp
+    src/graphics/materials/TerrainMaterial.cpp
 
     src/Mesh.cpp
     src/VertexBuffer.cpp
@@ -75,7 +75,6 @@ add_library(LittleRendererCore
 
     src/GameObject.cpp
     src/Transform.cpp
-    src/Renderer.cpp
 
     src/Camera.cpp
     src/FreeFlyCameraController.cpp
@@ -109,6 +108,7 @@ add_library(LittleRendererCore
     src/ecs/World.cpp
 
     src/systems/MovementSystem.cpp
+    src/systems/RenderSystem.cpp
 
     src/GameTime.cpp
 )

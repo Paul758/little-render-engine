@@ -1,4 +1,4 @@
-#include "graphics/Material.h"
+#include "graphics/materials/Material.h"
 
 class TerrainMaterial : public Material
 {
@@ -10,5 +10,5 @@ public:
 
     const ShaderProgram& getShader() const override;
 
-    void apply(const Camera& camera, const GameObject& gameObject) const override;
+    void apply(const RenderContext& renderContext) const override;
 };
