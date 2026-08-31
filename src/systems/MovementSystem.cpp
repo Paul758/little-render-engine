@@ -1,17 +1,27 @@
 #include "MovementSystem.h"
-#include "TransformComponent.h"
-#include "VelocityComponent.h"
+#include "components/TransformComponent.h"
+#include "components/VelocityComponent.h"
 
-MovementSystem::MovementSystem(ComponentRegistry registry, GameTime time) : registry_(registry), time_(time)
+MovementSystem::MovementSystem(ComponentRegistry& registry) : registry_(registry)
 {
     
 }
 
-void MovementSystem::update()
+void MovementSystem::update(float deltaTime)
 {
-    registry_.each<TransformComponent, VelocityComponent>(
-        [&](Entity, TransformComponent& transform, VelocityComponent& velocity)
-    {
-        transform.position += velocity.velocity * time_.deltaTime();
-    });
+    std::vector<Entity> entities = registry_.getEntitiesWith<TransformComponent, VelocityComponent>();
+
+    for (Entity entity : entities) {
+
+        TransformComponent* transform = registry_.get<TransformComponent>(entity);
+        VelocityComponent* velocity = registry_.get<VelocityComponent>(entity);
+
+        if (transform == nullptr || velocity == nullptr)
+        {
+            continue;
+        }
+
+        transform->position += velocity->velocity * deltaTime;
+    }   
+
 }

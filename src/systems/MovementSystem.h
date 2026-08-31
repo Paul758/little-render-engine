@@ -6,10 +6,9 @@
 class MovementSystem
 {
 public:
-    MovementSystem(ComponentRegistry registry, GameTime gameTime);
-    void update();
+    MovementSystem(ComponentRegistry& registry);
+    void update(float deltaTime);
 
 private:
-    ComponentRegistry registry_;
-    GameTime time_;
+    ComponentRegistry& registry_;
 };

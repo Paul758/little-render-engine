@@ -1,14 +1,16 @@
 #pragma once
 #include <cstdint>
+#include <vector>
 
-using Entity = std::uint32_t;
+#include "Entity.h"
 
 class EntityManager
 {
 public:
-    Entity createEntity();
-    void deleteEntity();
+    Entity create();
+    void destroy(Entity entity);
+    bool isAlive(Entity entity) const;
 private:
-    Entity livingEntitiesCount{};
-    const Entity maxEntityCount{10000};
+    std::vector<std::uint32_t> generations;
+    std::vector<std::uint32_t> freeIndices;
 };

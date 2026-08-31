@@ -40,23 +40,35 @@ public:
         return get<T>(entity) != nullptr;
     }
 
-    template<typename First, typename... Rest, typename Func>
-    void each(Func function)
+    void removeAll(Entity entity)
     {
+        for (auto& [type, pool] : componentPools)
+        {
+            pool->remove(entity);
+        }
+    }
+
+    template<typename First, typename... Rest>
+    std::vector<Entity> getEntitiesWith()
+    {
+        std::vector<Entity> result;
+
         ComponentPool<First>* firstPool = getPool<First>();
 
         if (firstPool == nullptr)
         {
-            return;
+            return result;
         }
 
         for (Entity entity : firstPool->getEntities())
         {
             if ((has<Rest>(entity) && ...))
             {
-                function(entity, *get<First>(entity), *get<Rest>(entity)...);
+                result.push_back(entity);
             }
         }
+
+        return result;
     }
 
 private:
@@ -78,6 +90,22 @@ private:
 
         return *static_cast<ComponentPool<T>*>(it->second.get());
     }
+
+    template<typename T>
+    ComponentPool<T>* getPool()
+    {
+        const std::type_index type = typeid(T);
+        auto it = componentPools.find(type);
+
+        if (it == componentPools.end())
+        {
+            return nullptr;
+        }
+
+        return static_cast<ComponentPool<T>*>(it->second.get());
+    }
+
+
 private:
    std::unordered_map<std::type_index, std::unique_ptr<IComponentPool>> componentPools; 
 };
