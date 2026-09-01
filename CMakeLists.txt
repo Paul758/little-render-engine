@@ -101,6 +101,7 @@ add_library(LittleRendererCore
 
     src/components/TransformComponent.cpp
     src/components/RenderComponent.h
+    src/components/PlayerInputComponent.h
 
     src/ecs/ComponentPool.h
     src/ecs/ComponentRegistry.h
@@ -109,6 +110,7 @@ add_library(LittleRendererCore
 
     src/systems/MovementSystem.cpp
     src/systems/RenderSystem.cpp
+    src/systems/InputSystem.cpp
 
     src/GameTime.cpp
 )
@@ -153,6 +155,9 @@ add_executable(
     tests/EntityManagerTest.cpp
     tests/WorldTest.cpp
     tests/MovementSystemTest.cpp
+    tests/InputSystemTest.cpp
+
+    tests/FakeInput.h
 )
 
 target_link_libraries(

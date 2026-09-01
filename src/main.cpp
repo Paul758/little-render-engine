@@ -27,8 +27,12 @@
 #include "GameTime.h"
 
 #include "systems/RenderSystem.h"
+#include "systems/InputSystem.h"
+
 #include "ecs/World.h"
 #include "Scene.h"
+
+#include "components/PlayerInputComponent.h"
 
 namespace
 {
@@ -148,11 +152,15 @@ int main()
         world.components().add(cube, renderComponentCubeB);
         world.components().add(cube, renderComponentCubeC);
 
-        //Renderer renderer;
         RenderSystem renderSystem(world.components());
-
-        PlayerController playerController(orbitCameraController);
+        
+        InputSystem inputSystem(world.components());
         Input input(window);
+        PlayerInputComponent playerInputComponent;
+        world.components().add(cube, playerInputComponent);
+
+        //PlayerController playerController(orbitCameraController);
+        
         
         //Pixel screen
         PixelRenderer pixelRenderer(640, 360, postProcessShader);
@@ -167,6 +175,9 @@ int main()
             glfwPollEvents();
 
             time.update();
+            input.update();
+
+            inputSystem.update(input);
 
             const bool cPressed = glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS;
 
