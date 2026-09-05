@@ -26,13 +26,29 @@
 #include "PixelRenderer.h"
 #include "GameTime.h"
 
+#include "components/PlayerInputComponent.h"
+#include "components/TransformComponent.h"
+#include "components/RenderComponent.h"
+#include "components/LocomotionIntentComponent.h"
+#include "components/BehaviourTreeComponent.h"
+#include "components/VelocityComponent.h"
+
 #include "systems/RenderSystem.h"
 #include "systems/InputSystem.h"
+#include "systems/IntentResetSystem.h"
+#include "systems/LocomotionSystem.h"
+#include "systems/ActionResolver.h"
+#include "systems/CommandBuffer.h"
+#include "systems/IntegrationSystem.h"
+#include "systems/BehaviourTreeSystem.h"
+
+#include "behaviour/player/PlayerMovementBTreeBuilder.h"
+#include "behaviour/BehaviourContext.h"
+#include "behaviour/BehaviourTreeRegistry.h"
 
 #include "ecs/World.h"
 #include "Scene.h"
 
-#include "components/PlayerInputComponent.h"
 
 namespace
 {
@@ -61,8 +77,8 @@ int main()
 
 
     GLFWwindow* window = glfwCreateWindow(
-        1920,
-        1080,
+        1280,
+        720,
         "Little Renderer",
         nullptr,
         nullptr
@@ -155,13 +171,29 @@ int main()
         RenderSystem renderSystem(world.components());
         
         InputSystem inputSystem(world.components());
-        Input input(window);
-        PlayerInputComponent playerInputComponent;
-        world.components().add(cube, playerInputComponent);
 
-        //PlayerController playerController(orbitCameraController);
+        PlayerMovementBTreeBuilder playerTreeBuilder;
+        auto playerLocomotionTree = playerTreeBuilder.build();
+        BehaviourTreeRegistry treeRegistry;
+        BehaviourTreeId playerTreeId = treeRegistry.add(std::move(playerLocomotionTree));
+
+        BehaviourTreeSystem behaviourTreeSystem(world.components(), treeRegistry);
+        IntentResetSystem intentResetSystem(world.components());
+        LocomotionSystem locomotionSystem(world.components());
+        ActionResolver actionResolver(world.components());
+        CommandBuffer commandBuffer;
+        IntegrationSystem integrationSystem(world.components());
+
+        Input input(window);
         
-        
+
+        BehaviourContext behaviourContext{cube, world.components()};
+
+        world.components().add(cube, PlayerInputComponent{});
+        world.components().add(cube, LocomotionIntentComponent{});
+        world.components().add(cube, BehaviourTreeComponent{playerTreeId});
+        world.components().add(cube, VelocityComponent{});
+
         //Pixel screen
         PixelRenderer pixelRenderer(640, 360, postProcessShader);
 
@@ -178,6 +210,12 @@ int main()
             input.update();
 
             inputSystem.update(input);
+            intentResetSystem.update();
+            commandBuffer.clear();
+            behaviourTreeSystem.update();
+            actionResolver.update(commandBuffer);
+            locomotionSystem.update(commandBuffer);
+            integrationSystem.update(time.deltaTime());
 
             const bool cPressed = glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS;
 

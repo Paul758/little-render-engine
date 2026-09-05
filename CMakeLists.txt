@@ -108,9 +108,22 @@ add_library(LittleRendererCore
     src/ecs/EntityManager.cpp
     src/ecs/World.cpp
 
-    src/systems/MovementSystem.cpp
+    src/systems/IntegrationSystem.cpp
     src/systems/RenderSystem.cpp
     src/systems/InputSystem.cpp
+    src/systems/BehaviourTreeSystem.cpp
+    src/systems/IntentResetSystem.cpp
+    src/systems/ActionResolver.cpp
+    src/systems/LocomotionSystem.cpp
+    src/systems/CommandBuffer.cpp
+
+    src/behaviour/BehaviourTreeRegistry.h
+    src/behaviour/BehaviourTree.cpp
+    src/behaviour/NodeState.h
+    src/behaviour/composites/Sequence.cpp
+    src/behaviour/composites/Selector.cpp
+    src/behaviour/composites/EvaluateAll.cpp
+    src/behaviour/player/PlayerMovementBTreeBuilder.cpp
 
     src/GameTime.cpp
 )
@@ -154,10 +167,23 @@ add_executable(
     tests/ComponentRegistryTest.cpp
     tests/EntityManagerTest.cpp
     tests/WorldTest.cpp
-    tests/MovementSystemTest.cpp
-    tests/InputSystemTest.cpp
 
-    tests/FakeInput.h
+    tests/IntegrationSystemTest.cpp
+    tests/InputSystemTest.cpp
+    tests/IntentResetSystemTest.cpp
+    tests/ActionResolverTest.cpp
+    tests/LocomotionSystemTest.cpp
+
+    tests/behaviour/BehaviourTreeRegistryTest.cpp
+    tests/behaviour/BehaviourTreeSystemTest.cpp
+    tests/behaviour/composites/SequenceTest.cpp
+    tests/behaviour/composites/SelectorTest.cpp
+    tests/behaviour/composites/EvaluateAllTest.cpp
+    tests/behaviour/player/PlayerMovementNodesTest.cpp
+
+
+
+    tests/fakes/FakeInput.h
 )
 
 target_link_libraries(
@@ -166,6 +192,11 @@ target_link_libraries(
     PRIVATE
         LittleRendererCore
         Catch2::Catch2WithMain
+)
+
+target_include_directories(LittleRendererTests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests
 )
 
 include(CTest)

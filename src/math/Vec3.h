@@ -17,6 +17,8 @@ struct Vec3
     Vec3& operator+=(const Vec3& other);
     Vec3& operator-=(const Vec3& other);
 
+    bool operator==(const Vec3&) const = default;
+
     Vec3 operator-();
 
     float length() const;
