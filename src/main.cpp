@@ -161,12 +161,12 @@ int main()
         activeController -> activate(window, camera);
 
         world.components().add(cube, transformCube);
-        world.components().add(cube, transformCubeB);
-        world.components().add(cube, transformCubeC);
+        world.components().add(cubeB, transformCubeB);
+        world.components().add(cubeC, transformCubeC);
 
         world.components().add(cube, renderComponentCube);
-        world.components().add(cube, renderComponentCubeB);
-        world.components().add(cube, renderComponentCubeC);
+        world.components().add(cubeB, renderComponentCubeB);
+        world.components().add(cubeC, renderComponentCubeC);
 
         RenderSystem renderSystem(world.components());
         

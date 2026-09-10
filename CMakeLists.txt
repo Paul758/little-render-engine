@@ -87,6 +87,7 @@ add_library(LittleRendererCore
     src/PixelFramebuffer.cpp
     src/PixelRenderer.cpp
 
+    src/math/Quaternion.cpp
     src/math/Mat4.cpp
     src/math/Vec3.cpp
     src/math/Vec2.cpp
@@ -162,6 +163,9 @@ target_link_libraries(
 #--------------------
 add_executable(
     LittleRendererTests
+
+    tests/math/Mat4Test.cpp
+    tests/math/QuaternionTest.cpp
 
     tests/ComponentPoolTest.cpp
     tests/ComponentRegistryTest.cpp

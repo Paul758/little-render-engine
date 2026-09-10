@@ -48,6 +48,24 @@ public:
         }
     }
 
+    //Test if this is actually correct
+    template<typename T>
+    bool remove(Entity entity)
+    {
+        const std::type_index type = typeid(T);
+
+        auto it = componentPools.find(type);
+
+        if (it == componentPools.end())
+        {
+            return false;
+        }
+
+        auto* pool = static_cast<ComponentPool<T>*>(it -> second.get());
+
+        pool->remove(entity);
+    }
+
     template<typename First, typename... Rest>
     std::vector<Entity> getEntitiesWith()
     {

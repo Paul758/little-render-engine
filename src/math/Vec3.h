@@ -20,8 +20,10 @@ struct Vec3
     bool operator==(const Vec3&) const = default;
 
     Vec3 operator-();
+    Vec3 operator-() const;
 
     float length() const;
+    float lengthSquared() const;
     Vec3 normalized() const;
 
     static float dot(const Vec3& a, const Vec3& b);

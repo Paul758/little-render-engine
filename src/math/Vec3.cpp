@@ -72,10 +72,21 @@ Vec3 Vec3::operator-()
     return Vec3{-x, -y, -z};
 }
 
+Vec3 Vec3::operator-() const
+{
+    return Vec3{-x, -y, -z};
+}
+
 float Vec3::length() const
 {
     return std::sqrt(x * x + y * y + z * z);
 }
+
+float Vec3::lengthSquared() const
+{
+    return x * x + y * y + z * z;
+}
+
 
 Vec3 Vec3::normalized() const 
 {

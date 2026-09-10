@@ -58,15 +58,13 @@ Mat4 Mat4::operator*(const Mat4& other) const
     return result;
 }
 
-Mat4& Mat4::operator+=(const Mat4& other)
+Vec3 Mat4::operator*(const Vec3& other) const
 {
-
-    for (size_t i = 0; i < 4; ++i)
-    {
-        values[i] += other.values[i];
-    }
-
-    return *this;
+    return Vec3{
+        Vec3::dot(this->getRow(0), other),
+        Vec3::dot(this->getRow(1), other),
+        Vec3::dot(this->getRow(2), other)
+    };
 }
 
 Mat4 Mat4::translate(const Vec3& translation)
@@ -144,6 +142,40 @@ Mat4 Mat4::rotateZ(float rotation)
     return result;
 }
 
+Mat4 Mat4::fromQuaternion(const Quaternion& quaternion)
+{
+    Quaternion q = quaternion.normalized();
+
+    const float xx = q.x * q.x;
+    const float yy = q.y * q.y;
+    const float zz = q.z * q.z;
+
+    const float xy = q.x * q.y;
+    const float xz = q.x * q.z;
+    const float yz = q.y * q.z;
+
+    const float wx = q.w * q.x;
+    const float wy = q.w * q.y;
+    const float wz = q.w * q.z;
+
+    Mat4 result = Mat4::identity();
+
+    result.at(0, 0) = 1.0f - 2.0f * (yy + zz);
+    result.at(0, 1) = 2.0f * (xy - wz);
+    result.at(0, 2) = 2.0f * (xz + wy);
+
+    result.at(1, 0) = 2.0f * (xy + wz);
+    result.at(1, 1) = 1.0f - 2.0f * (xx + zz);
+    result.at(1, 2) = 2.0f * (yz - wx);
+
+    result.at(2, 0) = 2.0f * (xz - wy);
+    result.at(2, 1) = 2.0f * (yz + wx);
+    result.at(2, 2) = 1.0f - 2.0f * (xx + yy);
+
+    return result;
+}
+
+
 Mat4 Mat4::perspective(float fieldOfViewRadians, float aspectRatio, float nearPlane, float farPlane)
 {
     if(aspectRatio == 0)
@@ -198,20 +230,28 @@ Mat4 Mat4::orthographic(float left, float right, float bottom, float top, float 
 }
 
 
-Mat4& Mat4::setRow(Mat4& result, size_t numRow, const Vec3& rowVec) 
+Mat4& Mat4::setRow(size_t numRow, const Vec3& rowVec) 
 {
-    result.at(numRow, 0) = rowVec.x;
-    result.at(numRow, 1) = rowVec.y;
-    result.at(numRow, 2) = rowVec.z;
-    return result;
+    at(numRow, 0) = rowVec.x;
+    at(numRow, 1) = rowVec.y;
+    at(numRow, 2) = rowVec.z;
+    return *this;
 }
 
-Mat4& Mat4::setColumn(Mat4& result, size_t numColumn, const Vec3& columnVec) 
+Mat4& Mat4::setColumn(size_t numColumn, const Vec3& columnVec) 
 {
-    result.at(0, numColumn) = columnVec.x;
-    result.at(1, numColumn) = columnVec.y;
-    result.at(2, numColumn) = columnVec.z;
-    return result;
+    at(0, numColumn) = columnVec.x;
+    at(1, numColumn) = columnVec.y;
+    at(2, numColumn) = columnVec.z;
+    return *this;
+}
+
+Vec3 Mat4::getRow(size_t row) const
+{
+    return Vec3{
+        this->at(row,0),
+        this->at(row,1),
+        this->at(row,2)};
 }
 
 Mat4 Mat4::lookAt(const Vec3& position, const Vec3& target, const Vec3& worldUp)
@@ -223,9 +263,9 @@ Mat4 Mat4::lookAt(const Vec3& position, const Vec3& target, const Vec3& worldUp)
     Vec3 right = Vec3::cross(forward, worldUp).normalized();
     Vec3 up = Vec3::cross(right, forward).normalized();
 
-    viewMatrix.setRow(viewMatrix, 0, right);
-    viewMatrix.setRow(viewMatrix, 1, up);
-    viewMatrix.setRow(viewMatrix, 2, -forward);
+    viewMatrix.setRow(0, right);
+    viewMatrix.setRow(1, up);
+    viewMatrix.setRow(2, -forward);
 
     //Calculate last column as dot from base vectors with position
     Vec3 translation;
@@ -233,7 +273,22 @@ Mat4 Mat4::lookAt(const Vec3& position, const Vec3& target, const Vec3& worldUp)
     translation.y = -Vec3::dot(up, position);
     translation.z = Vec3::dot(forward, position);
 
-    viewMatrix.setColumn(viewMatrix, 3, translation);
+    viewMatrix.setColumn(3, translation);
 
     return viewMatrix;
+}
+
+Mat4 view(const Vec3& position, const Vec3& forward, const Vec3& right, const Vec3& up)
+{
+    Mat4 result = Mat4::identity();
+
+    result.setRow(0, right);
+    result.setRow(1, up);
+    result.setRow(2, -forward);
+
+    result.at(0, 3) = -Vec3::dot(right, position);
+    result.at(1, 3) = -Vec3::dot(up, position);
+    result.at(2, 3) = Vec3::dot(forward, position);
+
+    return result;
 }

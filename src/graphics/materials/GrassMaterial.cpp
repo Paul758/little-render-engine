@@ -22,8 +22,8 @@ void GrassMaterial::apply(const RenderContext& renderContext) const
     texture_->bind(0);
 
     shader_->setInt("grassTexture", 0);
-    shader_->setVec3("cameraRight", renderContext.view.cameraRight);
-    shader_->setVec3("cameraUp", renderContext.view.cameraUp);
+    shader_->setVec3("cameraRight", renderContext.view.cameraBasis.right);
+    shader_->setVec3("cameraUp", renderContext.view.cameraBasis.up);
     shader_->setFloat("spriteWidth", 16.0f * PixelSettings::worldUnitsPerPixel());
     shader_->setFloat("spriteHeight", 16.0f * PixelSettings::worldUnitsPerPixel());
 }

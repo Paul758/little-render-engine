@@ -14,6 +14,10 @@ public:
 
     bool jumpPressed = false;
 
+    bool leftMouseDown = false;
+    bool rightMouseDown = false;
+    bool middleMouseDown = false;
+
     bool isKeyDown(int key) const override
     {
         if (key == GLFW_KEY_W) return wDown;
@@ -34,6 +38,21 @@ public:
     }
 
     bool isKeyReleased(int key) const override
+    {
+        return false;
+    }
+
+    bool isMouseButtonDown(MouseButton mouseButton) const override
+    {
+        return false;
+    }
+
+    bool isMouseButtonPressed(MouseButton mouseButton) const override
+    {
+        return false;
+    }
+
+    bool isMouseButtonReleased(MouseButton mouseButton) const override
     {
         return false;
     }
