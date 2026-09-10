@@ -30,8 +30,10 @@ public:
 
     static Mat4 fromQuaternion(const Quaternion& q);
 
+    Vec3 transformDirection(const Vec3& direction) const;
+    Vec3 transformPoint(const Vec3& point) const;
+
     Mat4 operator*(const Mat4& other) const;
-    Vec3 operator*(const Vec3& other) const;
 
     float& at(std::size_t row, std::size_t column);
     float at(std::size_t row, std::size_t column) const;

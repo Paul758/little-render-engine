@@ -23,7 +23,7 @@ TEST_CASE("InputSystem writes forward movement")
     REQUIRE(playerInputComponent != nullptr);
 
     CHECK(playerInputComponent->movement.x == 0.0f);
-    CHECK(playerInputComponent->movement.z == 1.0f);
+    CHECK(playerInputComponent->movement.z == -1.0f);
 }
 
 TEST_CASE("InputSystem sets jump when jump key was pressed")
@@ -110,6 +110,6 @@ TEST_CASE("Input system can produce diagonal input")
 
     REQUIRE(playerInput != nullptr);
 
-    CHECK(playerInput->movement.z == 1.0f);
+    CHECK(playerInput->movement.z == -1.0f);
     CHECK(playerInput->movement.x == 1.0f);
 }

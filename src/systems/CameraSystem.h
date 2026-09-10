@@ -3,6 +3,10 @@
 #include "ecs/ComponentRegistry.h"
 #include "graphics/RenderView.h"
 
+#include "components/camera/CameraComponent.h"
+#include "components/TransformComponent.h"
+#include "graphics/RenderViewport.h"
+
 class CameraSystem
 {
 public:

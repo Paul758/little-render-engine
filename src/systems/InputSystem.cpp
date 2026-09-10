@@ -29,12 +29,12 @@ void InputSystem::update(IInput& input)
 
         if (input.isKeyDown(GLFW_KEY_W))
         {
-            movementVector.z += 1.0f;
+            movementVector.z -= 1.0f;
         }
 
         if (input.isKeyDown(GLFW_KEY_S))
         {
-            movementVector.z -= 1.0f;
+            movementVector.z += 1.0f;
         }
 
         if (input.isKeyDown(GLFW_KEY_A))

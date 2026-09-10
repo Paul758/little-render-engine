@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdexcept>
 
 #include "systems/CameraSystem.h"
 
@@ -21,12 +22,22 @@ RenderView CameraSystem::buildRenderView(const RenderViewport& viewport)
     TransformComponent* cameraTransform = registry_.get<TransformComponent>(camera);
     CameraComponent* cameraComponent = registry_.get<CameraComponent>(camera);
 
-    assert(cameraTransform != nullptr);
-    assert(cameraComponent != nullptr);
+    if (cameraTransform == nullptr)
+    {
+        throw std::runtime_error("Camera entity has no TransformComponent");
+    }
+
+    if (cameraComponent == nullptr)
+    {
+        throw std::runtime_error("Camera entity has no CameraComponent");
+    }
     
     CameraBasis cameraBasis = buildCameraBasis(*cameraTransform);
 
-    assert(viewport.height != 0.0f);
+    if (viewport.height <= 0)
+    {
+        throw std::invalid_argument("Viewport height must be greater than zero");
+    }
 
     const float aspectRatio = 
         static_cast<float>(viewport.width) /
@@ -62,4 +73,5 @@ Mat4 CameraSystem::buildProjectionMatrix(const CameraComponent& camera, float as
         }
             
     }
+    throw std::runtime_error("Unknown camera projection type");
 }

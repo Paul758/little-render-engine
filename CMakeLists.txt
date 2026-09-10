@@ -62,10 +62,13 @@ add_library(LittleRendererCore
     src/graphics/ShaderProgram.cpp
     src/graphics/Texture2D.cpp
     src/graphics/PixelSettings.h
+    src/graphics/RenderView.h
+    src/graphics/RenderViewport.h
 
     src/graphics/materials/BasicMaterial.cpp
     src/graphics/materials/GrassMaterial.cpp
     src/graphics/materials/TerrainMaterial.cpp
+
 
     src/Mesh.cpp
     src/VertexBuffer.cpp
@@ -103,6 +106,8 @@ add_library(LittleRendererCore
     src/components/TransformComponent.cpp
     src/components/RenderComponent.h
     src/components/PlayerInputComponent.h
+    src/components/camera/CameraComponent.h
+    src/components/TransformUtils.cpp
 
     src/ecs/ComponentPool.h
     src/ecs/ComponentRegistry.h
@@ -117,6 +122,7 @@ add_library(LittleRendererCore
     src/systems/ActionResolver.cpp
     src/systems/LocomotionSystem.cpp
     src/systems/CommandBuffer.cpp
+    src/systems/CameraSystem.cpp
 
     src/behaviour/BehaviourTreeRegistry.h
     src/behaviour/BehaviourTree.cpp
@@ -177,6 +183,7 @@ add_executable(
     tests/IntentResetSystemTest.cpp
     tests/ActionResolverTest.cpp
     tests/LocomotionSystemTest.cpp
+    tests/CameraSystemTest.cpp
 
     tests/behaviour/BehaviourTreeRegistryTest.cpp
     tests/behaviour/BehaviourTreeSystemTest.cpp

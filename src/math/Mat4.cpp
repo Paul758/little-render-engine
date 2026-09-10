@@ -58,12 +58,40 @@ Mat4 Mat4::operator*(const Mat4& other) const
     return result;
 }
 
-Vec3 Mat4::operator*(const Vec3& other) const
+Vec3 Mat4::transformDirection(const Vec3& direction) const
 {
     return Vec3{
-        Vec3::dot(this->getRow(0), other),
-        Vec3::dot(this->getRow(1), other),
-        Vec3::dot(this->getRow(2), other)
+        at(0, 0) * direction.x +
+        at(0, 1) * direction.y +
+        at(0, 2) * direction.z,
+
+        at(1, 0) * direction.x +
+        at(1, 1) * direction.y +
+        at(1, 2) * direction.z,
+
+        at(2, 0) * direction.x +
+        at(2, 1) * direction.y +
+        at(2, 2) * direction.z
+    };
+}
+
+Vec3 Mat4::transformPoint(const Vec3& point) const
+{
+    return Vec3{
+        at(0, 0) * point.x +
+        at(0, 1) * point.y +
+        at(0, 2) * point.z +
+        at(0, 3),
+
+        at(1, 0) * point.x +
+        at(1, 1) * point.y +
+        at(1, 2) * point.z +
+        at(1, 3),
+
+        at(2, 0) * point.x +
+        at(2, 1) * point.y +
+        at(2, 2) * point.z +
+        at(2, 3)
     };
 }
 
@@ -278,7 +306,7 @@ Mat4 Mat4::lookAt(const Vec3& position, const Vec3& target, const Vec3& worldUp)
     return viewMatrix;
 }
 
-Mat4 view(const Vec3& position, const Vec3& forward, const Vec3& right, const Vec3& up)
+Mat4 Mat4::view(const Vec3& position, const Vec3& forward, const Vec3& right, const Vec3& up)
 {
     Mat4 result = Mat4::identity();
 

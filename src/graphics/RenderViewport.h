@@ -5,6 +5,6 @@
 struct RenderViewport
 {
     Entity camera;
-    float width;
-    float height;
+    int width;
+    int height;
 };
