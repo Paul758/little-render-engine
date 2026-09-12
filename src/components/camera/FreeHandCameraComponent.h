@@ -3,5 +3,5 @@
 struct FreeHandCameraComponent
 {
     float scrollSensitivity = 0.1f;
-    float lookSensitivity = 5.0f;
+    float lookSensitivity = 0.1f;
 };

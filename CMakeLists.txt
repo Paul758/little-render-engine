@@ -111,6 +111,7 @@ add_library(LittleRendererCore
     src/components/camera/FreeHandCameraComponent.h
     src/components/camera/WorldCameraComponent.h
     src/components/TransformUtils.cpp
+    src/components/camera/EditorCameraInputComponent.h
 
     src/ecs/ComponentPool.h
     src/ecs/ComponentRegistry.h
@@ -127,6 +128,8 @@ add_library(LittleRendererCore
     src/systems/CommandBuffer.cpp
     src/systems/CameraSystem.cpp
     src/systems/EditorCameraUpdateSystem.cpp
+    src/systems/EditorSystem.cpp
+    src/systems/EditorCameraInputSystem.cpp
 
     src/behaviour/BehaviourTreeRegistry.h
     src/behaviour/BehaviourTree.cpp

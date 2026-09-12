@@ -2,6 +2,6 @@
 
 struct FreeFlyCameraComponent
 {
-    float movementSpeed = 5.0f;
-    float lookSensitivity = 5.0f;
+    float movementSpeed = 50.0f;
+    float lookSensitivity = 0.1f;
 };

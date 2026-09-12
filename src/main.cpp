@@ -48,6 +48,7 @@
 #include "systems/BehaviourTreeSystem.h"
 #include "systems/CameraSystem.h"
 #include "systems/EditorCameraUpdateSystem.h"
+#include "systems/EditorSystem.h"
 
 #include "behaviour/player/PlayerMovementBTreeBuilder.h"
 #include "behaviour/BehaviourContext.h"
@@ -204,18 +205,19 @@ int main()
         //Setup editor camera
         Entity cameraEntity = world.createEntity();
         CameraSystem cameraSystem(world.components());
-        EditorCameraUpdateSystem editorCameraUpdateSystem(world.components(), cameraEntity);
-
+        
+        
         world.components().add(cameraEntity, TransformComponent{});
         world.components().add(cameraEntity, CameraComponent{});
         world.components().add(cameraEntity, FreeFlyCameraComponent{});
         world.components().add(cameraEntity, FreeHandCameraComponent{});
         world.components().add(cameraEntity, WorldCameraComponent{});
 
+        EditorCameraUpdateSystem editorCameraUpdateSystem(world.components(), cameraEntity);
+        EditorSystem editorSystem(world.components(), cameraEntity);
+
         //Pixel screen
         PixelRenderer pixelRenderer(640, 360, postProcessShader);
-
-        bool previousCPressed = false;
 
         GameTime time;
 
@@ -236,39 +238,14 @@ int main()
             locomotionSystem.update(commandBuffer);
             integrationSystem.update(time.deltaTime());
 
+            editorSystem.update(input, time.deltaTime());
 
-            editorCameraUpdateSystem.updateCamera(input, time.deltaTime());
-
-            //const bool cPressed = glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS;
-
-            /*if (cPressed && !previousCPressed)
-            {
-                if (activeController == &freeFlyController)
-                {
-                    activeController = &orbitCameraController;
-                }
-
-                else if (activeController == &cylinderController)
-                {
-                    activeController = &freeFlyController;
-                }
-
-                activeController -> activate(window, camera);
-            }
-            previousCPressed = cPressed;
-            activeController -> update(window, camera, time.deltaTime());*/
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
             }
 
-            /*RenderView renderView{
-                camera.getViewMatrix(),
-                camera.getProjectionMatrix(),
-                camera.getRight(),
-                camera.getUp()
-            };*/
             RenderViewport renderViewport{cameraEntity, 1280, 720};
             RenderView renderView = cameraSystem.buildRenderView(renderViewport);
 
