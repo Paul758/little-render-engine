@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <iostream>
 #include <GLFW/glfw3.h>
 
 #include "IInput.h"
@@ -47,6 +48,7 @@ private:
     }
 
     static void cursorPositionCallback(GLFWwindow* window, double x, double y);
+    void resetMousePosition();
 
 private:
     GLFWwindow* window_;

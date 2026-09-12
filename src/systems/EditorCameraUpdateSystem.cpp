@@ -7,7 +7,10 @@
 #include "components/TransformUtils.h"
 #include "components/camera/FreeFlyCameraComponent.h"
 #include "components/camera/FreeHandCameraComponent.h"
-#include <MathUtils.h>
+#include "components/camera/WorldCameraComponent.h"
+#include "math/MathUtils.h"
+#include "math/Vec2.h"
+#include <iostream>
 
 EditorCameraUpdateSystem::EditorCameraUpdateSystem(ComponentRegistry& registry, Entity& entity)
     : registry_(registry), camera(entity)
@@ -20,7 +23,9 @@ void EditorCameraUpdateSystem::updateCamera(Input& input, float deltaTime)
     TransformComponent* transform = registry_.get<TransformComponent>(camera);
     FreeFlyCameraComponent* freeFlyComponent = registry_.get<FreeFlyCameraComponent>(camera);
     FreeHandCameraComponent* freeHandComponent = registry_.get<FreeHandCameraComponent>(camera);
-    if (transform == nullptr || freeFlyComponent == nullptr)
+    WorldCameraComponent* worldCameraComponent = registry_.get<WorldCameraComponent>(camera);
+
+    if (transform == nullptr || freeFlyComponent == nullptr || freeHandComponent == nullptr || worldCameraComponent == nullptr)
     {
         return;
     }
@@ -30,32 +35,33 @@ void EditorCameraUpdateSystem::updateCamera(Input& input, float deltaTime)
         input.captureMouse();
     }
 
-    if(input.isKeyDown(GLFW_KEY_LEFT_CONTROL))
+    if(input.isKeyReleased(GLFW_KEY_LEFT_CONTROL))
     {
         input.releaseMouse();
     }
 
     if (input.isKeyDown(GLFW_KEY_LEFT_CONTROL))
     {
-        updateFreeFly(input, transform, freeFlyComponent, deltaTime);
+        updateFreeFly(input, transform, freeFlyComponent, worldCameraComponent, deltaTime);
     }
     else
     {
-        updateFreeHand(input, transform, freeHandComponent, deltaTime);
+        updateFreeHand(input, transform, freeHandComponent, worldCameraComponent, deltaTime);
     }
 }
 
-void updateFreeFly(Input& input, TransformComponent* transform, FreeFlyCameraComponent* freeFlyComponent, float deltaTime)
+void EditorCameraUpdateSystem::updateFreeFly(Input& input, TransformComponent* transform, FreeFlyCameraComponent* freeFlyComponent, WorldCameraComponent* worldCameraComponent, float deltaTime)
 {
         Vec3 movement{};
 
         Vec2 mouseDelta = input.getMouseDelta();
-        freeFlyComponent->yaw += mouseDelta.x * freeFlyComponent->lookSensitivity;
-        freeFlyComponent->pitch += mouseDelta.y * freeFlyComponent->lookSensitivity;
+        worldCameraComponent->yaw -= mouseDelta.x * freeFlyComponent->lookSensitivity;
+        worldCameraComponent->pitch -= mouseDelta.y * freeFlyComponent->lookSensitivity;
 
-        freeFlyComponent->pitch = std::clamp(freeFlyComponent->pitch, -89.0f, 89.0f);
-
-        transform->rotation = Vec3{Math::radians(freeFlyComponent->yaw), Math::radians(freeFlyComponent->pitch), 0.0f};
+        transform->rotation = Quaternion::fromEuler(Vec3{
+            Math::radians(worldCameraComponent->pitch),
+            Math::radians(worldCameraComponent->yaw),
+            0.0f});
 
         if (input.isKeyDown(GLFW_KEY_W))
         {
@@ -77,6 +83,16 @@ void updateFreeFly(Input& input, TransformComponent* transform, FreeFlyCameraCom
             movement += TransformUtils::getRight(*transform); 
         }
 
+        if (input.isKeyDown(GLFW_KEY_SPACE))
+        {
+            movement += TransformUtils::getUp(*transform);
+        }
+
+        if (input.isKeyDown(GLFW_KEY_LEFT_SHIFT))
+        {
+            movement += -TransformUtils::getUp(*transform);
+        }
+
         if (movement.lengthSquared() > 0.0f)
         {
             movement = movement.normalized();
@@ -85,7 +101,7 @@ void updateFreeFly(Input& input, TransformComponent* transform, FreeFlyCameraCom
         transform->position += movement * deltaTime;
 }
 
-void updateFreeHand(Input& input, TransformComponent* transform, FreeHandCameraComponent* freeHandComponent, float deltaTime)
+void EditorCameraUpdateSystem::updateFreeHand(Input& input, TransformComponent* transform, FreeHandCameraComponent* freeHandComponent, WorldCameraComponent* worldCameraComponent, float deltaTime)
 {
     Vec3 movement{};
 
@@ -93,33 +109,45 @@ void updateFreeHand(Input& input, TransformComponent* transform, FreeHandCameraC
     {
         Vec2 mouseDelta = input.getMouseDelta();
 
-        movement += Vec3{mouseDelta.x, mouseDelta.y, 0.0f};
-        transform->position += movement * deltaTime;
+        Vec3 forward = TransformUtils::getForward(*transform);
+        Vec3 right = TransformUtils::getRight(*transform);
+        Vec3 up = TransformUtils::getUp(*transform);
+
+        Vec3 translationHorizontal = right * -mouseDelta.x;
+        Vec3 translationVertical = up * mouseDelta.y;
+        
+        Vec3 translationVec = translationHorizontal + translationVertical;
+
+        transform->position += translationVec * deltaTime;
     }
 
     else if (input.isMouseButtonDown(MouseButton::Right))
     {
         Vec2 mouseDelta = input.getMouseDelta();
-        freeHandComponent->yaw += mouseDelta.x * freeHandComponent->lookSensitivity;
-        freeHandComponent->pitch += mouseDelta.y * freeHandComponent->lookSensitivity;
+        worldCameraComponent->yaw -= mouseDelta.x * freeHandComponent->lookSensitivity;
+        worldCameraComponent->pitch -= mouseDelta.y * freeHandComponent->lookSensitivity;
 
-        freeHandComponent->pitch = std::clamp(freeHandComponent->pitch, -89.0f, 89.0f);
-
-        transform->rotation = Vec3{Math::radians(freeHandComponent->yaw), Math::radians(freeHandComponent->pitch), 0.0f};
-
+        transform->rotation = Quaternion::fromEuler(Vec3{
+            Math::radians(worldCameraComponent->pitch),
+            Math::radians(worldCameraComponent->yaw),
+            0.0f
+        });
     }
 
     else if (input.getScrollDelta() != 0.0f)
     {
+
         Vec3 forward = TransformUtils::getForward(*transform);
         
         if (input.getScrollDelta() > 0.0f)
         {
             movement += forward * freeHandComponent->scrollSensitivity;
+            transform->position += movement;
         }
         else if(input.getScrollDelta() < 0.0f)
         {
             movement += -forward * freeHandComponent->scrollSensitivity;
+            transform->position += movement;
         }
     }
 }

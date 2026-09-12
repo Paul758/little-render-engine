@@ -107,6 +107,9 @@ add_library(LittleRendererCore
     src/components/RenderComponent.h
     src/components/PlayerInputComponent.h
     src/components/camera/CameraComponent.h
+    src/components/camera/FreeFlyCameraComponent.h
+    src/components/camera/FreeHandCameraComponent.h
+    src/components/camera/WorldCameraComponent.h
     src/components/TransformUtils.cpp
 
     src/ecs/ComponentPool.h
@@ -123,6 +126,7 @@ add_library(LittleRendererCore
     src/systems/LocomotionSystem.cpp
     src/systems/CommandBuffer.cpp
     src/systems/CameraSystem.cpp
+    src/systems/EditorCameraUpdateSystem.cpp
 
     src/behaviour/BehaviourTreeRegistry.h
     src/behaviour/BehaviourTree.cpp

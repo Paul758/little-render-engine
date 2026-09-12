@@ -23,6 +23,7 @@
 #include "graphics/materials/BasicMaterial.h"
 #include "graphics/materials/GrassMaterial.h"
 #include "graphics/materials/TerrainMaterial.h"
+#include "graphics/RenderViewport.h"
 #include "PixelRenderer.h"
 #include "GameTime.h"
 
@@ -32,6 +33,10 @@
 #include "components/LocomotionIntentComponent.h"
 #include "components/BehaviourTreeComponent.h"
 #include "components/VelocityComponent.h"
+#include "components/camera/CameraComponent.h"
+#include "components/camera/FreeFlyCameraComponent.h"
+#include "components/camera/FreeHandCameraComponent.h"
+#include "components/camera/WorldCameraComponent.h"
 
 #include "systems/RenderSystem.h"
 #include "systems/InputSystem.h"
@@ -41,6 +46,8 @@
 #include "systems/CommandBuffer.h"
 #include "systems/IntegrationSystem.h"
 #include "systems/BehaviourTreeSystem.h"
+#include "systems/CameraSystem.h"
+#include "systems/EditorCameraUpdateSystem.h"
 
 #include "behaviour/player/PlayerMovementBTreeBuilder.h"
 #include "behaviour/BehaviourContext.h"
@@ -151,14 +158,14 @@ int main()
         RenderComponent renderComponentCubeB{&cubeMesh, &basicMaterial};
         RenderComponent renderComponentCubeC{&cubeMesh, &basicMaterial};
 
-        Camera camera(Vec3{0.0f, 3.0f, 5.0f});
-        FreeFlyCameraController freeFlyController;
-        CylinderCameraController cylinderController;
-        OrbitCameraController orbitCameraController;
+        //Camera camera(Vec3{0.0f, 3.0f, 5.0f});
+        //FreeFlyCameraController freeFlyController;
+        //CylinderCameraController cylinderController;
+        //OrbitCameraController orbitCameraController;
 
-        CameraController* activeController = &cylinderController;
+        //CameraController* activeController = &cylinderController;
 
-        activeController -> activate(window, camera);
+        //activeController -> activate(window, camera);
 
         world.components().add(cube, transformCube);
         world.components().add(cubeB, transformCubeB);
@@ -194,6 +201,17 @@ int main()
         world.components().add(cube, BehaviourTreeComponent{playerTreeId});
         world.components().add(cube, VelocityComponent{});
 
+        //Setup editor camera
+        Entity cameraEntity = world.createEntity();
+        CameraSystem cameraSystem(world.components());
+        EditorCameraUpdateSystem editorCameraUpdateSystem(world.components(), cameraEntity);
+
+        world.components().add(cameraEntity, TransformComponent{});
+        world.components().add(cameraEntity, CameraComponent{});
+        world.components().add(cameraEntity, FreeFlyCameraComponent{});
+        world.components().add(cameraEntity, FreeHandCameraComponent{});
+        world.components().add(cameraEntity, WorldCameraComponent{});
+
         //Pixel screen
         PixelRenderer pixelRenderer(640, 360, postProcessShader);
 
@@ -204,6 +222,7 @@ int main()
         //Main loop
         while (glfwWindowShouldClose(window) == GLFW_FALSE)
         {
+            input.beginFrame();
             glfwPollEvents();
 
             time.update();
@@ -217,9 +236,12 @@ int main()
             locomotionSystem.update(commandBuffer);
             integrationSystem.update(time.deltaTime());
 
-            const bool cPressed = glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS;
 
-            if (cPressed && !previousCPressed)
+            editorCameraUpdateSystem.updateCamera(input, time.deltaTime());
+
+            //const bool cPressed = glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS;
+
+            /*if (cPressed && !previousCPressed)
             {
                 if (activeController == &freeFlyController)
                 {
@@ -234,19 +256,21 @@ int main()
                 activeController -> activate(window, camera);
             }
             previousCPressed = cPressed;
-            activeController -> update(window, camera, time.deltaTime());
+            activeController -> update(window, camera, time.deltaTime());*/
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
             }
 
-            RenderView renderView{
+            /*RenderView renderView{
                 camera.getViewMatrix(),
                 camera.getProjectionMatrix(),
                 camera.getRight(),
                 camera.getUp()
-            };
+            };*/
+            RenderViewport renderViewport{cameraEntity, 1280, 720};
+            RenderView renderView = cameraSystem.buildRenderView(renderViewport);
 
             pixelRenderer.beginFrame();
             renderSystem.render(renderView);

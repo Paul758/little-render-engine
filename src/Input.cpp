@@ -1,6 +1,7 @@
 
 
 #include "Input.h"
+#include <iostream>
 
 Input::Input(GLFWwindow* window) : window_(window)
 {
@@ -101,8 +102,12 @@ void Input::cursorPositionCallback(GLFWwindow* window, double x, double y)
     }
 
     input->mouseDelta += newPosition - input->mousePosition;
-
     input->mousePosition = newPosition;
+}
+
+Vec2 Input::getMouseDelta() const
+{
+    return mouseDelta;
 }
 
 void Input::captureMouse()
@@ -113,4 +118,11 @@ void Input::captureMouse()
 void Input::releaseMouse()
 {
     glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    resetMousePosition();
+}
+
+void Input::resetMousePosition()
+{
+    hasMousePosition = false;
+    mouseDelta = Vec2{};
 }
