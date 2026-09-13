@@ -2,9 +2,9 @@
 
 #include <cstddef>
 
-#include "Vec3.h"
-#include "Quaternion.h"
+#include "math/Vec3.h"
 
+class Quaternion;
 
 class Mat4
 {

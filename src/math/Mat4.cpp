@@ -3,6 +3,7 @@
 
 #include "Mat4.h"
 #include "MathUtils.h"
+#include "Quaternion.h"
 
 Mat4::Mat4() = default;
 

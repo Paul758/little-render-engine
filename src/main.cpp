@@ -26,6 +26,7 @@
 #include "graphics/RenderViewport.h"
 #include "PixelRenderer.h"
 #include "GameTime.h"
+#include "Renderer.h"
 
 #include "components/PlayerInputComponent.h"
 #include "components/TransformComponent.h"
@@ -37,6 +38,8 @@
 #include "components/camera/FreeFlyCameraComponent.h"
 #include "components/camera/FreeHandCameraComponent.h"
 #include "components/camera/WorldCameraComponent.h"
+#include "components/camera/FixedOrbitCameraComponent.h"
+#include "components/camera/OrbitPose.h"
 
 #include "systems/RenderSystem.h"
 #include "systems/InputSystem.h"
@@ -49,6 +52,7 @@
 #include "systems/CameraSystem.h"
 #include "systems/EditorCameraUpdateSystem.h"
 #include "systems/EditorSystem.h"
+#include "systems/FixedOrbitCameraSystem.h"
 
 #include "behaviour/player/PlayerMovementBTreeBuilder.h"
 #include "behaviour/BehaviourContext.h"
@@ -56,6 +60,7 @@
 
 #include "ecs/World.h"
 #include "Scene.h"
+#include "ScreenRenderer.h"
 
 
 namespace
@@ -148,6 +153,10 @@ int main()
         ShaderProgram terrainShader("assets/shaders/terrain.vert", "assets/shaders/terrain.frag");
         ShaderProgram postProcessShader("assets/shaders/postprocess.vert", "assets/shaders/postprocess.frag");
 
+        ShaderProgram screenShader("assets/shaders/screen.vert", "assets/shaders/screen.frag");
+
+        ScreenRenderer screenRenderer(screenShader);
+
         BasicMaterial basicMaterial(basicShader);
         GrassMaterial grassMaterial(grassShader, grassTexture);
         TerrainMaterial terrainMaterial(terrainShader);
@@ -203,21 +212,55 @@ int main()
         world.components().add(cube, VelocityComponent{});
 
         //Setup editor camera
-        Entity cameraEntity = world.createEntity();
+        Entity editorCameraEntity = world.createEntity();
         CameraSystem cameraSystem(world.components());
-        
-        
-        world.components().add(cameraEntity, TransformComponent{});
-        world.components().add(cameraEntity, CameraComponent{});
-        world.components().add(cameraEntity, FreeFlyCameraComponent{});
-        world.components().add(cameraEntity, FreeHandCameraComponent{});
-        world.components().add(cameraEntity, WorldCameraComponent{});
+        TransformComponent editorTransform;
+        editorTransform.position = Vec3{0.0f, 2.0f, 5.0f};
+        editorTransform.rotation = Quaternion::lookRotation(Vec3{0.0f, 0.0f, 0.0f} - editorTransform.position, Vec3{0.0f, 1.0f, 0.0f});
 
-        EditorCameraUpdateSystem editorCameraUpdateSystem(world.components(), cameraEntity);
-        EditorSystem editorSystem(world.components(), cameraEntity);
+
+        world.components().add(editorCameraEntity, editorTransform);
+        world.components().add(editorCameraEntity, CameraComponent{});
+        world.components().add(editorCameraEntity, FreeFlyCameraComponent{});
+        world.components().add(editorCameraEntity, FreeHandCameraComponent{});
+        world.components().add(editorCameraEntity, WorldCameraComponent{});
+
+        EditorCameraUpdateSystem editorCameraUpdateSystem(world.components(), editorCameraEntity);
+        EditorSystem editorSystem(world.components(), editorCameraEntity);
+
+        //Setting up Game camera
+        Entity gameCameraEntity = world.createEntity();
+        std::vector<OrbitPose> orbitPoses{{45.0f, 30.0f}, {135.0f, 30.0f}, {225.0f, 30.0f}, {315.0f, 30.f}};
+        FixedOrbitCameraComponent fixedOrbitCameraComponent{transformCube.position, orbitPoses, 0, 8.0f, 10.0f};
+        world.components().add(gameCameraEntity, TransformComponent{});
+        world.components().add(gameCameraEntity, CameraComponent{});
+        world.components().add(gameCameraEntity, WorldCameraComponent{});
+        world.components().add(gameCameraEntity, fixedOrbitCameraComponent);
+
+        FixedOrbitCameraSystem fixedOrbitCameraSystem(world.components());
+        fixedOrbitCameraSystem.initialize(gameCameraEntity);
+
+        Framebuffer editorFramebuffer {640, 720, TextureFilter::Linear};
+        Framebuffer gameFramebuffer {640, 720, TextureFilter::Linear};
+
+        RenderViewport editorViewport{
+            .camera = editorCameraEntity,
+            .width = editorFramebuffer.getWidth(),
+            .height = editorFramebuffer.getHeight(),
+            .target = &editorFramebuffer
+        };
+
+        RenderViewport gameViewport{
+            .camera = gameCameraEntity,
+            .width = gameFramebuffer.getWidth(),
+            .height = gameFramebuffer.getHeight(),
+            .target = &gameFramebuffer
+        };
+
+        Renderer renderer(renderSystem, cameraSystem);
 
         //Pixel screen
-        PixelRenderer pixelRenderer(640, 360, postProcessShader);
+        //PixelRenderer pixelRenderer(640, 360, postProcessShader);
 
         GameTime time;
 
@@ -239,20 +282,42 @@ int main()
             integrationSystem.update(time.deltaTime());
 
             editorSystem.update(input, time.deltaTime());
-
+            fixedOrbitCameraSystem.update(input, gameCameraEntity, time.deltaTime());
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
             }
 
-            RenderViewport renderViewport{cameraEntity, 1280, 720};
-            RenderView renderView = cameraSystem.buildRenderView(renderViewport);
+            //RenderViewport renderViewport{editorCameraEntity, 1280, 720};
+            //RenderView renderView = cameraSystem.buildRenderView(renderViewport);
 
-            pixelRenderer.beginFrame();
-            renderSystem.render(renderView);
-            pixelRenderer.present(window);
-        
+            //pixelRenderer.beginFrame();
+            //renderSystem.render(renderView);
+            //pixelRenderer.present(window);
+            
+            renderer.renderViewport(editorViewport);
+            renderer.renderViewport(gameViewport);
+
+            Framebuffer::unbind();
+
+            int windowWidth = 0;
+            int windowHeight = 0;
+            glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
+
+            glDisable(GL_DEPTH_TEST);
+
+            glViewport(0, 0, windowWidth, windowHeight);
+
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            const int halfWidth = windowWidth / 2;
+
+            screenRenderer.drawTexture(editorFramebuffer.getColorTexture(), 0, 0, halfWidth, windowHeight);
+            screenRenderer.drawTexture(gameFramebuffer.getColorTexture(), halfWidth, 0, windowWidth - halfWidth, windowHeight);
+
+            glEnable(GL_DEPTH_TEST);
+
             glfwSwapBuffers(window);
             
         }

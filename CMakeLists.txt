@@ -64,6 +64,7 @@ add_library(LittleRendererCore
     src/graphics/PixelSettings.h
     src/graphics/RenderView.h
     src/graphics/RenderViewport.h
+    src/graphics/Framebuffer.cpp
 
     src/graphics/materials/BasicMaterial.cpp
     src/graphics/materials/GrassMaterial.cpp
@@ -76,6 +77,8 @@ add_library(LittleRendererCore
     src/PrimitiveMesh.cpp
     src/IndexBuffer.cpp
 
+    src/Renderer.cpp
+
     src/GameObject.cpp
     src/Transform.cpp
 
@@ -85,10 +88,11 @@ add_library(LittleRendererCore
     src/OrbitCameraController.cpp
     src/ProjectionMode.h
     src/Scene.cpp
-
+    src/ScreenRenderer.cpp
 
     src/PixelFramebuffer.cpp
     src/PixelRenderer.cpp
+
 
     src/math/Quaternion.cpp
     src/math/Mat4.cpp
@@ -112,6 +116,8 @@ add_library(LittleRendererCore
     src/components/camera/WorldCameraComponent.h
     src/components/TransformUtils.cpp
     src/components/camera/EditorCameraInputComponent.h
+    src/components/camera/FixedOrbitCameraComponent.h
+    src/components/camera/OrbitPose.h
 
     src/ecs/ComponentPool.h
     src/ecs/ComponentRegistry.h
@@ -130,6 +136,7 @@ add_library(LittleRendererCore
     src/systems/EditorCameraUpdateSystem.cpp
     src/systems/EditorSystem.cpp
     src/systems/EditorCameraInputSystem.cpp
+    src/systems/FixedOrbitCameraSystem.cpp
 
     src/behaviour/BehaviourTreeRegistry.h
     src/behaviour/BehaviourTree.cpp

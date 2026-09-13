@@ -182,3 +182,24 @@ TEST_CASE("Identity quaternion does not rotate vector")
     REQUIRE(result.z == Approx(4.0f));
 }
 
+TEST_CASE("lookRotation keeps canonical forward identity")
+{
+    Quaternion q = Quaternion::lookRotation(Vec3{0.0f, 0.0f, -1.0f}, Vec3{0.0f, 1.0f, 0.0f});
+
+    Vec3 result = q.rotate(Vec3{0.0f, 0.0f, -1.0f});
+
+    REQUIRE(result.x == Approx(0.0f).margin(0.0001f));
+    REQUIRE(result.y == Approx(0.0f).margin(0.0001f));
+    REQUIRE(result.z == Approx(-1.0f).margin(0.0001f));
+}
+
+TEST_CASE("lookRotation rotates forward to left")
+{
+    Quaternion q = Quaternion::lookRotation(Vec3{-1.0f, 0.0f, 0.0f}, Vec3{0.0f, 1.0f, 0.0f});
+
+    Vec3 result = q.rotate(Vec3{0.0f, 0.0f, -1.0f});
+
+    REQUIRE(result.x == Approx(-1.0f).margin(0.0001f));
+    REQUIRE(result.y == Approx(0.0f).margin(0.0001f));
+    REQUIRE(result.z == Approx(0.0f).margin(0.0001f));
+}

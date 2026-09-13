@@ -13,7 +13,7 @@
 class EditorCameraUpdateSystem
 {
 public:
-    EditorCameraUpdateSystem(ComponentRegistry& registry, Entity& camera);
+    EditorCameraUpdateSystem(ComponentRegistry& registry, Entity camera);
     void updateCamera(EditorCameraInputComponent& input, float deltaTime);
 
 private:
@@ -22,5 +22,5 @@ private:
 
 private:
     ComponentRegistry& registry_;
-    Entity& camera;
+    Entity camera;
 };

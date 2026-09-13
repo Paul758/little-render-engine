@@ -13,7 +13,7 @@
 #include "math/Vec2.h"
 #include <iostream>
 
-EditorCameraUpdateSystem::EditorCameraUpdateSystem(ComponentRegistry& registry, Entity& entity)
+EditorCameraUpdateSystem::EditorCameraUpdateSystem(ComponentRegistry& registry, Entity entity)
     : registry_(registry), camera(entity)
 {
 
