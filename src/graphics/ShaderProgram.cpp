@@ -102,6 +102,19 @@ void ShaderProgram::setFloat(const std::string& name, float value) const
     glUniform1f(location, value);
 }
 
+void ShaderProgram::setBool(const std::string& name, bool value) const
+{
+    const GLint location = glGetUniformLocation(programID, name.c_str());
+
+    if(location == -1)
+    {
+        std::cerr << "Uniform not found: " << name << '\n';
+        return;
+    }
+
+    glUniform1i(location, value);
+}
+
 
 void ShaderProgram::setVec3(const std::string& name, const Vec3& vector) const
 {

@@ -4,7 +4,7 @@
 
 PixelRenderer::PixelRenderer(int width, int height, ShaderProgram& postProcessShader) : 
     frameBuffer_(width, height),
-    screenMesh_(MeshData{PrimitiveMesh::getQuadVertices(), PrimitiveMesh::getQuadIndices()}),
+    screenMesh_(PrimitiveMesh::quad()),
     postProcessShader_(&postProcessShader)
 {
 }

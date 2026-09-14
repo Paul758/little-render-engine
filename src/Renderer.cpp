@@ -7,9 +7,12 @@
 
 #include "systems/CameraSystem.h"
 #include "systems/RenderSystem.h"
+#include "systems/LightingSystem.h"
 
-Renderer::Renderer(RenderSystem& renderSystem, CameraSystem& cameraSystem)
-    : renderSystem_(renderSystem), cameraSystem_(cameraSystem)
+#include "components/lighting/LightingData.h"
+
+Renderer::Renderer(RenderSystem& renderSystem, CameraSystem& cameraSystem, LightingSystem& lightSystem)
+    : renderSystem_(renderSystem), cameraSystem_(cameraSystem), lightSystem_(lightSystem)
 {
 
 }
@@ -30,5 +33,8 @@ void Renderer::renderViewport(const RenderViewport& viewport)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     RenderView view = cameraSystem_.buildRenderView(viewport);
-    renderSystem_.render(view);
+
+    LightingData lighting = lightSystem_.buildLightingData();
+
+    renderSystem_.render(view, lighting);
 }

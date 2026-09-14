@@ -3,6 +3,8 @@
 #include "systems/RenderSystem.h"
 #include "components/RenderComponent.h"
 #include "components/TransformComponent.h"
+#include "components/lighting/LightingData.h"
+
 
 #include "graphics/materials/Material.h"
 #include "graphics/ShaderProgram.h"
@@ -12,7 +14,7 @@ RenderSystem::RenderSystem(ComponentRegistry& registry) : registry_(registry)
 
 }
 
-void RenderSystem::render(const RenderView& view)
+void RenderSystem::render(const RenderView& view, const LightingData& lightingData)
 {
     std::vector<Entity> renderEntities = registry_.getEntitiesWith<RenderComponent, TransformComponent>();
 
@@ -23,12 +25,12 @@ void RenderSystem::render(const RenderView& view)
 
         if (renderComponent == nullptr || transformComponent == nullptr)
         {
-            return;
+            continue;
         }
 
         if (renderComponent->material == nullptr || renderComponent->mesh == nullptr)
         {
-            return;
+            continue;
         }
 
         const Material* material = renderComponent->material;
@@ -36,11 +38,12 @@ void RenderSystem::render(const RenderView& view)
 
         shader.use();
 
+        // View
         shader.setMat4("model", transformComponent->getModelMatrix());
         shader.setMat4("view", view.view);
         shader.setMat4("projection", view.projection);
 
-        RenderContext context {view, *transformComponent};
+        RenderContext context {view, *transformComponent, lightingData};
 
         material->apply(context);
 

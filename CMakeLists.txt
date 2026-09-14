@@ -118,6 +118,7 @@ add_library(LittleRendererCore
     src/components/camera/EditorCameraInputComponent.h
     src/components/camera/FixedOrbitCameraComponent.h
     src/components/camera/OrbitPose.h
+    src/components/lighting/LightingData.h
 
     src/ecs/ComponentPool.h
     src/ecs/ComponentRegistry.h
@@ -137,6 +138,7 @@ add_library(LittleRendererCore
     src/systems/EditorSystem.cpp
     src/systems/EditorCameraInputSystem.cpp
     src/systems/FixedOrbitCameraSystem.cpp
+    src/systems/LightingSystem.cpp
 
     src/behaviour/BehaviourTreeRegistry.h
     src/behaviour/BehaviourTree.cpp

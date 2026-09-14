@@ -1,51 +1,61 @@
 #include "PrimitiveMesh.h"
 #include "math/Vec3.h"
+#include "MeshData.h"
+
+MeshData PrimitiveMesh::cube()
+{
+    return MeshData{
+        .vertices = getCubeVertices(),
+        .indices = getCubeIndices()
+    };
+}
+
+MeshData PrimitiveMesh::quad()
+{
+    return MeshData{
+        .vertices = getQuadVertices(),
+        .indices = getQuadIndices()
+    };
+}
 
 std::vector<Vertex> PrimitiveMesh::getCubeVertices()
 {
-    const Vec3 red     {1.0f, 0.0f, 0.0f};
-    const Vec3 green   {0.0f, 1.0f, 0.0f};
-    const Vec3 blue    {0.0f, 0.0f, 1.0f};
-    const Vec3 yellow  {1.0f, 1.0f, 0.0f};
-    const Vec3 magenta {1.0f, 0.0f, 1.0f};
-    const Vec3 cyan    {0.0f, 1.0f, 1.0f};
-
     return {
-        // Back face
-        {{-0.5f, -0.5f, -0.5f}, red},
-        {{ 0.5f, -0.5f, -0.5f}, red},
-        {{ 0.5f,  0.5f, -0.5f}, red},
-        {{-0.5f,  0.5f, -0.5f}, red},
+        // Back face, normal = -Z
+        {{-0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}},
+        {{ 0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}},
+        {{ 0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}},
+        {{-0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}},
 
-        // Front face
-        {{-0.5f, -0.5f,  0.5f}, green},
-        {{ 0.5f, -0.5f,  0.5f}, green},
-        {{ 0.5f,  0.5f,  0.5f}, green},
-        {{-0.5f,  0.5f,  0.5f}, green},
+        // Front face, normal = +Z
+        {{-0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}},
+        {{ 0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {1.0f, 0.0f}},
+        {{ 0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}},
+        {{-0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {0.0f, 1.0f}},
 
-        // Left face
-        {{-0.5f, -0.5f, -0.5f}, blue},
-        {{-0.5f, -0.5f,  0.5f}, blue},
-        {{-0.5f,  0.5f,  0.5f}, blue},
-        {{-0.5f,  0.5f, -0.5f}, blue},
+        // Left face, normal = -X
+        {{-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+        {{-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
+        {{-0.5f,  0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}},
+        {{-0.5f,  0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}},
 
-        // Right face
-        {{ 0.5f, -0.5f, -0.5f}, yellow},
-        {{ 0.5f,  0.5f, -0.5f}, yellow},
-        {{ 0.5f,  0.5f,  0.5f}, yellow},
-        {{ 0.5f, -0.5f,  0.5f}, yellow},
+        // Right face, normal = +X
+        {{ 0.5f, -0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+        {{ 0.5f,  0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}},
+        {{ 0.5f,  0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}},
+        {{ 0.5f, -0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
 
-        // Bottom face
-        {{-0.5f, -0.5f, -0.5f}, magenta},
-        {{ 0.5f, -0.5f, -0.5f}, magenta},
-        {{ 0.5f, -0.5f,  0.5f}, magenta},
-        {{-0.5f, -0.5f,  0.5f}, magenta},
+        // Bottom face, normal = -Y
+        {{-0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}},
+        {{ 0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}},
+        {{ 0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}},
+        {{-0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}},
 
-        // Top face
-        {{-0.5f,  0.5f, -0.5f}, cyan},
-        {{-0.5f,  0.5f,  0.5f}, cyan},
-        {{ 0.5f,  0.5f,  0.5f}, cyan},
-        {{ 0.5f,  0.5f, -0.5f}, cyan}
+        // Top face, normal = +Y
+        {{-0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}},
+        {{-0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}},
+        {{ 0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}},
+        {{ 0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}}
     };
 }
 
@@ -66,27 +76,23 @@ std::vector<Vertex> PrimitiveMesh::getQuadVertices()
     return {
         {
             {-1.0f, -1.0f, 0.0f},
-            {1.0f, 1.0f, 1.0f},
-            {0.0f, 0.0f},
-            {0.0f, 0.0f}
+            { 0.0f,  0.0f, 1.0f},
+            { 0.0f,  0.0f}
         },
         {
-            {1.0f, -1.0f, 0.0f},
-            {1.0f, 1.0f, 1.0f},
-            {1.0f, 0.0f},
-            {0.0f, 0.0f}
+            { 1.0f, -1.0f, 0.0f},
+            { 0.0f,  0.0f, 1.0f},
+            { 1.0f,  0.0f}
         },
         {
-            {1.0f, 1.0f, 0.0f},
-            {1.0f, 1.0f, 1.0f},
-            {1.0f, 1.0f},
-            {0.0f, 0.0f}
+            { 1.0f,  1.0f, 0.0f},
+            { 0.0f,  0.0f, 1.0f},
+            { 1.0f,  1.0f}
         },
         {
-            {-1.0f, 1.0f, 0.0f},
-            {1.0f, 1.0f, 1.0f},
-            {0.0f, 1.0f},
-            {0.0f, 0.0f}
+            {-1.0f,  1.0f, 0.0f},
+            { 0.0f,  0.0f, 1.0f},
+            { 0.0f,  1.0f}
         }
     };
 }

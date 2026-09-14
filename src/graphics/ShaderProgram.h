@@ -29,6 +29,7 @@ public:
     void setMat4(const std::string& name, const Mat4& matrix) const;
     void setInt(const std::string& name, int value) const;
     void setFloat(const std::string& name, float value) const;
+    void setBool(const std::string& name, bool value) const;
     void setVec3(const std::string& name, const Vec3& vector) const;
     void setVec2(const std::string& name, const Vec2& vector) const;
 

@@ -306,10 +306,10 @@ void Terrain::addGrassQuad(MeshData& data, const Vec3& center, const Vec3& color
 {
     const GLuint baseIndex = static_cast<GLuint>(data.vertices.size());
 
-    data.vertices.push_back({center, color, {0.0f, 0.0f}, {-0.5f, 0.0f}});
+    /*data.vertices.push_back({center, color, {0.0f, 0.0f}, {-0.5f, 0.0f}});
     data.vertices.push_back({center, color, {1.0f, 0.0f}, {0.5f, 0.0f}});
     data.vertices.push_back({center, color, {1.0f, 1.0f}, {0.5f, 1.0f}});
-    data.vertices.push_back({center, color, {0.0f, 1.0f}, {-0.5f, 1.0f}});
+    data.vertices.push_back({center, color, {0.0f, 1.0f}, {-0.5f, 1.0f}});*/
 
     data.indices.push_back(baseIndex + 0);
     data.indices.push_back(baseIndex + 1);

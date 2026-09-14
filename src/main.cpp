@@ -40,6 +40,8 @@
 #include "components/camera/WorldCameraComponent.h"
 #include "components/camera/FixedOrbitCameraComponent.h"
 #include "components/camera/OrbitPose.h"
+#include "components/lighting/DirectionalLightComponent.h"
+
 
 #include "systems/RenderSystem.h"
 #include "systems/InputSystem.h"
@@ -53,6 +55,7 @@
 #include "systems/EditorCameraUpdateSystem.h"
 #include "systems/EditorSystem.h"
 #include "systems/FixedOrbitCameraSystem.h"
+#include "systems/LightingSystem.h"
 
 #include "behaviour/player/PlayerMovementBTreeBuilder.h"
 #include "behaviour/BehaviourContext.h"
@@ -154,14 +157,18 @@ int main()
         ShaderProgram postProcessShader("assets/shaders/postprocess.vert", "assets/shaders/postprocess.frag");
 
         ShaderProgram screenShader("assets/shaders/screen.vert", "assets/shaders/screen.frag");
+        ShaderProgram standardShader("assets/shaders/standard.vert", "assets/shaders/standard.frag");
 
         ScreenRenderer screenRenderer(screenShader);
 
-        BasicMaterial basicMaterial(basicShader);
+        BasicMaterial basicMaterial(standardShader);
+
+        basicMaterial.albedoColor = Vec3{0.7f, 0.7f, 0.2f};
+
         GrassMaterial grassMaterial(grassShader, grassTexture);
         TerrainMaterial terrainMaterial(terrainShader);
 
-        MeshData cubeData {PrimitiveMesh::getCubeVertices(), PrimitiveMesh::getCubeIndices()};
+        MeshData cubeData = PrimitiveMesh::cube();
         Mesh cubeMesh{cubeData};
 
         RenderComponent renderComponentCube{&cubeMesh, &basicMaterial};
@@ -259,7 +266,18 @@ int main()
             .target = &gameFramebuffer
         };
 
-        Renderer renderer(renderSystem, cameraSystem);
+        //Set up lighting
+        Entity sun = world.createEntity();
+        DirectionalLightComponent sunLight({1.0f, 0.9f, 0.9f}, 1.0f);
+        TransformComponent sunTransform;
+        sunTransform.position = Vec3{3.0f, 5.0f, 3.0f};
+        sunTransform.rotation = Quaternion::lookRotation(Vec3{0.0f, 0.0f, 0.0f} - sunTransform.position, Vec3{0.0f, 1.0f, 0.0f});
+        world.components().add(sun, sunLight);
+        world.components().add(sun, sunTransform);
+
+        LightingSystem lightingSystem(world.components());
+
+        Renderer renderer(renderSystem, cameraSystem, lightingSystem);
 
         //Pixel screen
         //PixelRenderer pixelRenderer(640, 360, postProcessShader);
