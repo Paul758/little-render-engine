@@ -232,8 +232,10 @@ int main()
         Entity gameCameraEntity = world.createEntity();
         std::vector<OrbitPose> orbitPoses{{45.0f, 30.0f}, {135.0f, 30.0f}, {225.0f, 30.0f}, {315.0f, 30.f}};
         FixedOrbitCameraComponent fixedOrbitCameraComponent{transformCube.position, orbitPoses, 0, 8.0f, 10.0f};
+        CameraComponent gameCameraComponent{ProjectionType::Orthographic, 10.0f};
+        
         world.components().add(gameCameraEntity, TransformComponent{});
-        world.components().add(gameCameraEntity, CameraComponent{});
+        world.components().add(gameCameraEntity, gameCameraComponent);
         world.components().add(gameCameraEntity, WorldCameraComponent{});
         world.components().add(gameCameraEntity, fixedOrbitCameraComponent);
 
