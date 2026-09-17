@@ -1,13 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
-#include "ecs/World.h"
-#include "ecs/Entity.h"
+#include "engine/core/ecs/World.h"
+#include "engine/core/ecs/Entity.h"
 
-#include "components/PlayerInputComponent.h"
+#include "game/components/PlayerInputComponent.h"
 
-#include "behaviour/BehaviourContext.h"
-#include "behaviour/player/PlayerMovementNodes.h"
+#include "engine/behaviour/BehaviourContext.h"
+#include "game/behaviour/player/PlayerMovementNodes.h"
 
 using Catch::Approx;
 

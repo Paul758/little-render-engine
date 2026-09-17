@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "behaviour/BehaviourTreeRegistry.h"
-#include "behaviour/player/PlayerMovementBTreeBuilder.h"
-#include "behaviour/composites/Sequence.h"
+#include "engine/behaviour/BehaviourTreeRegistry.h"
+#include "game/behaviour/player/PlayerMovementBTreeBuilder.h"
+#include "engine/behaviour/composites/Sequence.h"
 
 TEST_CASE("BehaviourTreeRegistry registers a new tree")
 {

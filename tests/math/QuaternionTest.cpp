@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
-#include "math/Quaternion.h"
-#include "math/Vec3.h"
+#include "engine/math/Quaternion.h"
+#include "engine/math/Vec3.h"
 
 using Catch::Approx;
 

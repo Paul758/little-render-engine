@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "behaviour/composites/Selector.h"
+#include "engine/behaviour/composites/Selector.h"
 
-#include "ecs/World.h"
+#include "engine/core/ecs/World.h"
 
 #include "fakes/behaviour/FakeNodes.h"
 

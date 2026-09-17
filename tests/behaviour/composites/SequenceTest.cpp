@@ -2,15 +2,15 @@
 
 #include <vector>
 
-#include "behaviour/BehaviourTreeRegistry.h"
-#include "behaviour/player/PlayerMovementBTreeBuilder.h"
-#include "behaviour/composites/Sequence.h"
+#include "engine/behaviour/BehaviourTreeRegistry.h"
+#include "game/behaviour/player/PlayerMovementBTreeBuilder.h"
+#include "engine/behaviour/composites/Sequence.h"
 
-#include "ecs/World.h"
+#include "engine/core/ecs/World.h"
 
-#include "components/BehaviourTreeComponent.h"
+#include "engine/components/BehaviourTreeComponent.h"
 
-#include "systems/BehaviourTreeSystem.h"
+#include "engine/systems/BehaviourTreeSystem.h"
 
 #include "fakes/behaviour/FakeNodes.h"
 

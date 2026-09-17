@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "ecs/World.h"
-#include "components/TransformComponent.h"
-#include "components/VelocityComponent.h"
+#include "engine/core/ecs/World.h"
+#include "engine/components/TransformComponent.h"
+#include "game/components/VelocityComponent.h"
 
 TEST_CASE("World creates entities")
 {

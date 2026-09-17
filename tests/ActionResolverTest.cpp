@@ -1,13 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
-#include "ecs/World.h"
-#include "ecs/Entity.h"
+#include "engine/core/ecs/World.h"
+#include "engine/core/ecs/Entity.h"
 
-#include "components/LocomotionIntentComponent.h"
+#include "game/components/LocomotionIntentComponent.h"
 
-#include "systems/CommandBuffer.h"
-#include "systems/ActionResolver.h"
+#include "game/systems/CommandBuffer.h"
+#include "game/systems/ActionResolver.h"
 
 TEST_CASE("ActionResolver does not crate a move command without LocomotionIntentComponent")
 {

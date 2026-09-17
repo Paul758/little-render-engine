@@ -3,13 +3,10 @@
 #include <vector>
 #include <algorithm>
 
-#include "behaviour/BehaviourTreeRegistry.h"
-
-#include "ecs/World.h"
-
-#include "components/BehaviourTreeComponent.h"
-
-#include "systems/BehaviourTreeSystem.h"
+#include "engine/behaviour/BehaviourTreeRegistry.h"
+#include "engine/core/ecs/World.h"
+#include "engine/components/BehaviourTreeComponent.h"
+#include "engine/systems/BehaviourTreeSystem.h"
 
 #include "fakes/behaviour/FakeNodes.h"
 

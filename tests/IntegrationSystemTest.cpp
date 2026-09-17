@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "systems/IntegrationSystem.h"
-#include "ecs/World.h"
-#include "components/TransformComponent.h"
-#include "components/VelocityComponent.h"
+#include "game/systems/IntegrationSystem.h"
+#include "engine/core/ecs/World.h"
+#include "engine/components/TransformComponent.h"
+#include "game/components/VelocityComponent.h"
 
 TEST_CASE("Movement System finds Entities with Transform and Velocity")
 {

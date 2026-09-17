@@ -1,13 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
-#include "ecs/World.h"
-#include "ecs/Entity.h"
+#include "engine/core/ecs/World.h"
+#include "engine/core/ecs/Entity.h"
 
-#include "components/PlayerInputComponent.h"
-#include "components/LocomotionIntentComponent.h"
+#include "game/components/PlayerInputComponent.h"
+#include "game/components/LocomotionIntentComponent.h"
 
-#include "systems/IntentResetSystem.h"
+#include "game/systems/IntentResetSystem.h"
 
 
 TEST_CASE("IntentResetSystem resets a LocomotionIntent")

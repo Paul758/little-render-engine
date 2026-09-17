@@ -1,14 +1,14 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
-#include "ecs/World.h"
-#include "ecs/Entity.h"
+#include "engine/core/ecs/World.h"
+#include "engine/core/ecs/Entity.h"
 
-#include "components/LocomotionIntentComponent.h"
-#include "components/VelocityComponent.h"
+#include "game/components/LocomotionIntentComponent.h"
+#include "game/components/VelocityComponent.h"
 
-#include "systems/CommandBuffer.h"
-#include "systems/LocomotionSystem.h"
+#include "game/systems/CommandBuffer.h"
+#include "game/systems/LocomotionSystem.h"
 
 TEST_CASE("LocomotionSystem applies move commands resulting in modified velocity")
 {

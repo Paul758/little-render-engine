@@ -1,10 +1,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
-#include "math/Mat4.h"
+#include "engine/math/Mat4.h"
 
-#include "components/TransformComponent.h"
-#include "math/MathUtils.h"
+#include "engine/components/TransformComponent.h"
+#include "engine/math/MathUtils.h"
 
 using Catch::Approx;
 

@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "systems/InputSystem.h"
-#include "ecs/World.h"
-#include "components/PlayerInputComponent.h"
+#include "game/systems/PlayerInputSystem.h"
+#include "engine/core/ecs/World.h"
+#include "game/components/PlayerInputComponent.h"
 #include "fakes/FakeInput.h"
 
 TEST_CASE("InputSystem writes forward movement")
@@ -11,7 +11,7 @@ TEST_CASE("InputSystem writes forward movement")
     Entity entity{0, 0};
 
     registry.add<PlayerInputComponent>(entity, PlayerInputComponent{});
-    InputSystem inputSystem(registry);
+    PlayerInputSystem inputSystem(registry);
 
     FakeInput input;
     input.wDown = true;
@@ -32,7 +32,7 @@ TEST_CASE("InputSystem sets jump when jump key was pressed")
     Entity entity{0, 0};
 
     registry.add<PlayerInputComponent>(entity, PlayerInputComponent{});
-    InputSystem inputSystem(registry);
+    PlayerInputSystem inputSystem(registry);
 
     FakeInput input;
     input.jumpPressed = true;
@@ -55,7 +55,7 @@ TEST_CASE("InputSystem clears jump when jump is not pressed")
     component.jumpPressed = true;
 
     registry.add<PlayerInputComponent>(entity, component);
-    InputSystem inputSystem(registry);
+    PlayerInputSystem inputSystem(registry);
 
     FakeInput input;
     input.jumpPressed = false;
@@ -76,7 +76,7 @@ TEST_CASE("Opposite movement keys cancel each other")
 
     registry.add<PlayerInputComponent>(entity, PlayerInputComponent{});
 
-    InputSystem inputSystem(registry);
+    PlayerInputSystem inputSystem(registry);
 
     FakeInput input;
     input.wDown = true;
@@ -98,7 +98,7 @@ TEST_CASE("Input system can produce diagonal input")
 
     registry.add<PlayerInputComponent>(entity, PlayerInputComponent{});
 
-    InputSystem inputSystem(registry);
+    PlayerInputSystem inputSystem(registry);
 
     FakeInput input;
     input.wDown = true;

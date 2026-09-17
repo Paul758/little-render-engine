@@ -1,6 +1,0 @@
-#include "TransformComponent.h"
-
-Mat4 TransformComponent::getModelMatrix() const
-{
-    return Mat4::translate(position) * Mat4::fromQuaternion(rotation) * Mat4::scale(scale);
-}

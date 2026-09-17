@@ -10,17 +10,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-# Prevent GLFW from building things we do not need.
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+# ==================
+# Dependencies
+# ==================
 
 include(FetchContent)
 
 #--------------------
 # GLFW
 #--------------------
+
+# Prevent GLFW from building things we do not need.
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -57,127 +62,138 @@ target_include_directories(glad
 #--------------------
 # Engine library
 #--------------------
-add_library(LittleRendererCore  
-    src/graphics/Shader.cpp
-    src/graphics/ShaderProgram.cpp
-    src/graphics/Texture2D.cpp
-    src/graphics/PixelSettings.h
-    src/graphics/RenderView.h
-    src/graphics/RenderViewport.h
-    src/graphics/Framebuffer.cpp
+add_library(LittleRendererEngine STATIC 
 
-    src/graphics/materials/BasicMaterial.cpp
-    src/graphics/materials/GrassMaterial.cpp
-    src/graphics/materials/TerrainMaterial.cpp
+    # Graphics
+    engine/graphics/Shader.cpp
+    engine/graphics/ShaderProgram.cpp
+    engine/graphics/Texture2D.cpp
+    engine/graphics/Framebuffer.cpp
+    engine/graphics/IndexBuffer.cpp
+    engine/graphics/Mesh.cpp
+    engine/graphics/VertexBuffer.cpp
+    engine/graphics/VertexArray.cpp
+    engine/graphics/PrimitiveMesh.cpp
 
+    engine/graphics/materials/BasicMaterial.cpp
 
-    src/Mesh.cpp
-    src/VertexBuffer.cpp
-    src/VertexArray.cpp
-    src/PrimitiveMesh.cpp
-    src/IndexBuffer.cpp
+    engine/graphics/rendering/Renderer.cpp
+    engine/graphics/rendering/ScreenRenderer.cpp
 
-    src/Renderer.cpp
+    # Math
+    engine/math/Quaternion.cpp
+    engine/math/Mat4.cpp
+    engine/math/Vec3.cpp
+    engine/math/Vec2.cpp
 
-    src/GameObject.cpp
-    src/Transform.cpp
+    # Core
+    engine/core/input/Input.cpp
+    engine/core/time/GameTime.cpp
 
-    src/Camera.cpp
-    src/FreeFlyCameraController.cpp
-    src/CylinderCameraController.cpp
-    src/OrbitCameraController.cpp
-    src/ProjectionMode.h
-    src/Scene.cpp
-    src/ScreenRenderer.cpp
+    # Components
+    engine/components/TransformComponent.cpp
+    engine/components/TransformUtils.cpp
 
-    src/PixelFramebuffer.cpp
-    src/PixelRenderer.cpp
+    # ECS
+    engine/core/ecs/EntityManager.cpp
+    engine/core/ecs/World.cpp
 
+    # Systems
+    engine/systems/RenderSystem.cpp
+    engine/systems/BehaviourTreeSystem.cpp
+    engine/systems/CameraSystem.cpp
+    engine/systems/EditorCameraUpdateSystem.cpp
+    engine/systems/EditorSystem.cpp
+    engine/systems/EditorCameraInputSystem.cpp
+    engine/systems/LightingSystem.cpp
 
-    src/math/Quaternion.cpp
-    src/math/Mat4.cpp
-    src/math/Vec3.cpp
-    src/math/Vec2.cpp
-    src/math/MathUtils.h
-
-    src/PlayerController.cpp
-    src/Input.cpp
-
-    src/grass/GrassType.h
-    src/grass/Terrain.cpp
-    src/grass/TerrainCell.h
-
-    src/components/TransformComponent.cpp
-    src/components/RenderComponent.h
-    src/components/PlayerInputComponent.h
-    src/components/camera/CameraComponent.h
-    src/components/camera/FreeFlyCameraComponent.h
-    src/components/camera/FreeHandCameraComponent.h
-    src/components/camera/WorldCameraComponent.h
-    src/components/TransformUtils.cpp
-    src/components/camera/EditorCameraInputComponent.h
-    src/components/camera/FixedOrbitCameraComponent.h
-    src/components/camera/OrbitPose.h
-    src/components/lighting/LightingData.h
-
-    src/ecs/ComponentPool.h
-    src/ecs/ComponentRegistry.h
-    src/ecs/EntityManager.cpp
-    src/ecs/World.cpp
-
-    src/systems/IntegrationSystem.cpp
-    src/systems/RenderSystem.cpp
-    src/systems/InputSystem.cpp
-    src/systems/BehaviourTreeSystem.cpp
-    src/systems/IntentResetSystem.cpp
-    src/systems/ActionResolver.cpp
-    src/systems/LocomotionSystem.cpp
-    src/systems/CommandBuffer.cpp
-    src/systems/CameraSystem.cpp
-    src/systems/EditorCameraUpdateSystem.cpp
-    src/systems/EditorSystem.cpp
-    src/systems/EditorCameraInputSystem.cpp
-    src/systems/FixedOrbitCameraSystem.cpp
-    src/systems/LightingSystem.cpp
-
-    src/behaviour/BehaviourTreeRegistry.h
-    src/behaviour/BehaviourTree.cpp
-    src/behaviour/NodeState.h
-    src/behaviour/composites/Sequence.cpp
-    src/behaviour/composites/Selector.cpp
-    src/behaviour/composites/EvaluateAll.cpp
-    src/behaviour/player/PlayerMovementBTreeBuilder.cpp
-
-    src/GameTime.cpp
+    # Behaviour
+    engine/behaviour/BehaviourTree.cpp
+    engine/behaviour/composites/Sequence.cpp
+    engine/behaviour/composites/Selector.cpp
+    engine/behaviour/composites/EvaluateAll.cpp
 )
 
 target_include_directories(
-    LittleRendererCore
+    LittleRendererEngine
 
     PUBLIC
-    src
+    ${CMAKE_CURRENT_SOURCE_DIR}
 
     PRIVATE
-    external/stb
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/stb
 )
 
-target_link_libraries(LittleRendererCore
+target_link_libraries(LittleRendererEngine
     PUBLIC
         glad
         glfw
+)
+
+target_compile_definitions(LittleRendererEngine
+    PUBLIC
+        GLFW_INCLUDE_NONE
+)
+
+#--------------------
+# Game Library
+#--------------------
+add_library(LittleRendererGame STATIC
+    
+    # Behaviour
+    game/behaviour/player/PlayerMovementBTreeBuilder.cpp
+
+    # Graphics
+    game/graphics/materials/GrassMaterial.cpp
+    game/graphics/materials/TerrainMaterial.cpp
+
+    # Grass
+    game/grass/Terrain.cpp
+
+    # Rendering
+    game/rendering/PixelFramebuffer.cpp
+    game/rendering/PixelRenderer.cpp
+
+    # Game Systems
+    game/systems/camera/FixedOrbitCameraSystem.cpp
+    game/systems/ActionResolver.cpp
+    game/systems/CommandBuffer.cpp
+    game/systems/IntegrationSystem.cpp
+    game/systems/IntentResetSystem.cpp
+    game/systems/LocomotionSystem.cpp
+    game/systems/PlayerInputSystem.cpp
+)
+
+
+target_include_directories(LittleRendererGame
+
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(LittleRendererGame
+
+    PUBLIC
+        LittleRendererEngine
+)
+
+target_compile_definitions(LittleRendererGame
+    PUBLIC
+        GLFW_INCLUDE_NONE
 )
 
 #--------------------
 # Main executable
 #--------------------
 add_executable(LittleRenderer
-    src/main.cpp
+    app/main.cpp
 )
 
 target_link_libraries(
     LittleRenderer
     PRIVATE
-    LittleRendererCore
+    LittleRendererEngine
+    LittleRendererGame
 )
 
 #--------------------
@@ -217,7 +233,8 @@ target_link_libraries(
     LittleRendererTests
 
     PRIVATE
-        LittleRendererCore
+        LittleRendererEngine
+        LittleRendererGame
         Catch2::Catch2WithMain
 )
 

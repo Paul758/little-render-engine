@@ -2,8 +2,8 @@
 
 #include<vector>
 
-#include "behaviour/NodeState.h"
-#include "behaviour/Node.h"
+#include "engine/behaviour/NodeState.h"
+#include "engine/behaviour/Node.h"
 
 struct TestComponent
 {

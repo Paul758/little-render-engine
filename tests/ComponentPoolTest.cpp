@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "ecs/ComponentPool.h"
-#include "components/TransformComponent.h"
+#include "engine/core/ecs/ComponentPool.h"
+#include "engine/components/TransformComponent.h"
 
 TEST_CASE("ComponentPool stores and retrieves a component")
 {

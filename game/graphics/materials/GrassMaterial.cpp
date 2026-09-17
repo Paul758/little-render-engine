@@ -1,0 +1,29 @@
+#include "engine/graphics/ShaderProgram.h"
+#include "engine/graphics/Texture2D.h"
+#include "engine/graphics/PixelSettings.h"
+
+#include "game/graphics/materials/GrassMaterial.h"
+
+ShaderProgram* shader_;
+Texture2D* texture_;
+
+
+GrassMaterial::GrassMaterial(ShaderProgram& shader, Texture2D& texture) : shader_(&shader), texture_(&texture)
+{
+}
+
+const ShaderProgram& GrassMaterial::getShader() const
+{
+    return *shader_;
+}
+
+void GrassMaterial::apply(const RenderContext& renderContext) const
+{
+    texture_->bind(0);
+
+    shader_->setInt("grassTexture", 0);
+    shader_->setVec3("cameraRight", renderContext.view.cameraBasis.right);
+    shader_->setVec3("cameraUp", renderContext.view.cameraBasis.up);
+    shader_->setFloat("spriteWidth", 16.0f * PixelSettings::worldUnitsPerPixel());
+    shader_->setFloat("spriteHeight", 16.0f * PixelSettings::worldUnitsPerPixel());
+}

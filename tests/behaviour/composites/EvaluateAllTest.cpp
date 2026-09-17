@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "ecs/World.h"
-#include "ecs/Entity.h"
+#include "engine/core/ecs/World.h"
+#include "engine/core/ecs/Entity.h"
 
-#include "behaviour/composites/EvaluateAll.h"
+#include "engine/behaviour/composites/EvaluateAll.h"
 #include "fakes/behaviour/FakeNodes.h"
 
 TEST_CASE("EvaluateAll evaluates all children")

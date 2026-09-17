@@ -1,19 +1,19 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
-#include "ecs/World.h"
-#include "ecs/Entity.h"
+#include "engine/core/ecs/World.h"
+#include "engine/core/ecs/Entity.h"
 
-#include "systems/CameraSystem.h"
+#include "engine/systems/CameraSystem.h"
 
-#include "components/camera/CameraComponent.h"
-#include "components/TransformComponent.h"
-#include "components/TransformUtils.h"
+#include "engine/components/camera/CameraComponent.h"
+#include "engine/components/TransformComponent.h"
+#include "engine/components/TransformUtils.h"
 
-#include "graphics/RenderViewport.h"
-#include "graphics/RenderView.h"
+#include "engine/graphics/rendering/RenderViewport.h"
+#include "engine/graphics/rendering/RenderView.h"
 
-#include "math/MathUtils.h"
+#include "engine/math/MathUtils.h"
 
 using Catch::Approx;
 

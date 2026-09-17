@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "IInput.h"
+#include "engine/core/input/IInput.h"
 
 class FakeInput : public IInput
 {
