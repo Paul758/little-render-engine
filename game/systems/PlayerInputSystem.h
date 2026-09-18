@@ -7,7 +7,7 @@ class PlayerInputSystem
 {
 public:
     PlayerInputSystem(ComponentRegistry& registry);
-    void update(IInput& input);
+    void update(const IInput& input);
 private:
     ComponentRegistry& registry_;
 };

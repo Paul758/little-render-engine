@@ -15,7 +15,7 @@ FixedOrbitCameraSystem::FixedOrbitCameraSystem(ComponentRegistry& registry)
 
 }
 
-void FixedOrbitCameraSystem::update(Input& input, Entity activeCameraEntity, float deltaTime)
+void FixedOrbitCameraSystem::update(const Input& input, Entity activeCameraEntity, float deltaTime)
 {
     TransformComponent* transform = registry_.get<TransformComponent>(activeCameraEntity);
     FixedOrbitCameraComponent* fixedOrbitCameraComponent = registry_.get<FixedOrbitCameraComponent>(activeCameraEntity);

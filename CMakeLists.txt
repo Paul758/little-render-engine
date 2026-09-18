@@ -64,6 +64,9 @@ target_include_directories(glad
 #--------------------
 add_library(LittleRendererEngine STATIC 
 
+    # Editor
+    engine/editor/Editor.cpp
+
     # Graphics
     engine/graphics/Shader.cpp
     engine/graphics/ShaderProgram.cpp
@@ -103,7 +106,6 @@ add_library(LittleRendererEngine STATIC
     engine/systems/BehaviourTreeSystem.cpp
     engine/systems/CameraSystem.cpp
     engine/systems/EditorCameraUpdateSystem.cpp
-    engine/systems/EditorSystem.cpp
     engine/systems/EditorCameraInputSystem.cpp
     engine/systems/LightingSystem.cpp
 
@@ -140,6 +142,8 @@ target_compile_definitions(LittleRendererEngine
 #--------------------
 add_library(LittleRendererGame STATIC
     
+    game/Game.cpp
+
     # Behaviour
     game/behaviour/player/PlayerMovementBTreeBuilder.cpp
 
@@ -185,8 +189,11 @@ target_compile_definitions(LittleRendererGame
 #--------------------
 # Main executable
 #--------------------
-add_executable(LittleRenderer
+add_executable(
+    LittleRenderer
+
     app/main.cpp
+    app/Application.cpp
 )
 
 target_link_libraries(

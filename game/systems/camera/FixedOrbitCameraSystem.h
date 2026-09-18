@@ -11,7 +11,7 @@ class FixedOrbitCameraSystem
 {
 public:
     FixedOrbitCameraSystem(ComponentRegistry& componentRegistry);
-    void update(Input& input, Entity cameraEntity, float deltaTime);
+    void update(const Input& input, Entity cameraEntity, float deltaTime);
     void initialize(Entity cameraEntity);
     
 private:

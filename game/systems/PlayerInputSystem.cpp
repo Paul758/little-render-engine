@@ -10,7 +10,7 @@ PlayerInputSystem::PlayerInputSystem(ComponentRegistry& registry)
 
 }
 
-void PlayerInputSystem::update(IInput& input)
+void PlayerInputSystem::update(const IInput& input)
 {
     std::vector<Entity> entities = registry_.getEntitiesWith<PlayerInputComponent>();
 

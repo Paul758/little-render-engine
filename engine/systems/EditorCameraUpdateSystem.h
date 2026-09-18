@@ -12,14 +12,13 @@
 class EditorCameraUpdateSystem
 {
 public:
-    EditorCameraUpdateSystem(ComponentRegistry& registry, Entity camera);
-    void updateCamera(EditorCameraInputComponent& input, float deltaTime);
+    EditorCameraUpdateSystem(ComponentRegistry& registry);
+    void updateCamera(float deltaTime, Entity camera);
 
 private:
-    void updateFreeFly(EditorCameraInputComponent& input, TransformComponent* transform, FreeFlyCameraComponent* freeFlyComponent, WorldCameraComponent* WorldCameraComponent, float deltaTime);   
-    void updateFreeHand(EditorCameraInputComponent& input, TransformComponent* transform, FreeHandCameraComponent* freeHandComponent, WorldCameraComponent* WorldCameraComponent, float deltaTime);
+    void updateFreeFly(EditorCameraInputComponent* input, TransformComponent* transform, FreeFlyCameraComponent* freeFlyComponent, WorldCameraComponent* WorldCameraComponent, float deltaTime);   
+    void updateFreeHand(EditorCameraInputComponent* input, TransformComponent* transform, FreeHandCameraComponent* freeHandComponent, WorldCameraComponent* WorldCameraComponent, float deltaTime);
 
 private:
     ComponentRegistry& registry_;
-    Entity camera;
 };
