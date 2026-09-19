@@ -1,6 +1,8 @@
 #include "engine/graphics/PrimitiveMesh.h"
 #include "engine/math/Vec3.h"
+#include "engine/math/Vec2.h"
 #include "engine/graphics/MeshData.h"
+#include <cmath>
 
 MeshData PrimitiveMesh::cube()
 {
@@ -103,4 +105,68 @@ std::vector<GLuint> PrimitiveMesh::getQuadIndices()
         0, 1, 2,
         0, 2, 3
     };
+}
+
+MeshData PrimitiveMesh::sphere(std::uint32_t slices, std::uint32_t stacks)
+{
+    MeshData data;
+
+    constexpr float PI = 3.14159265358979323846f;
+
+    for (std::uint32_t stack = 0; stack <= stacks; ++stack)
+    {    
+        float v = static_cast<float>(stack) / stacks;
+
+        float phi = v * PI;
+
+        for (std::uint32_t slice = 0; slice <= slices; ++slice)
+        {  
+            float u = static_cast<float>(slice) / slices;
+
+            float theta = u * 2.0f * PI;
+
+            float x = std::sin(phi) * std::cos(theta);
+            
+            float y = std::cos(phi);
+
+            float z = std::sin(phi) * std::sin(theta);
+
+            Vertex vertex;
+
+            vertex.position = Vec3{x, y, z};
+            vertex.normal = Vec3{x, y, z};
+            vertex.texCoord = Vec2{u, v};
+
+            data.vertices.push_back(vertex);
+
+        }
+    }
+
+    std::uint32_t rowLength = slices + 1;
+
+    for (std::uint32_t stack = 0; stack < stacks; ++stack)
+    {
+        for (std::uint32_t slice = 0; slice < slices; ++slice)
+        {
+            std::uint32_t a = stack * rowLength + slice;
+
+            std::uint32_t b = a + 1;
+
+            std::uint32_t c = (stack + 1) * rowLength + slice;
+
+            std::uint32_t d = c + 1;
+
+            // Triangle 1
+            data.indices.push_back(a);
+            data.indices.push_back(c);
+            data.indices.push_back(b);
+
+            // Triangle 2
+            data.indices.push_back(b);
+            data.indices.push_back(c);
+            data.indices.push_back(d);
+        }
+    }
+
+    return data;
 }

@@ -116,8 +116,6 @@ void Application::run()
         time_->update();
         input_->update();
 
-        
-
         game_->update(*input_, time_->deltaTime());
         editor_->update(*input_, time_->deltaTime());
 
@@ -125,8 +123,6 @@ void Application::run()
         {
             glfwSetWindowShouldClose(window_, GLFW_TRUE);
         }
-
-        
 
         RenderViewport editorViewport{
             editor_->getCamera(),

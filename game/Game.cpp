@@ -68,6 +68,17 @@ void Game::createScene()
     world_.components().add(cubeA, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
     world_.components().add(cubeB, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
     world_.components().add(cubeC, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
+
+    MeshData sphereData = PrimitiveMesh::sphere(8, 4);
+    sphereMesh_ = std::make_unique<Mesh>(sphereData);
+    
+    Entity sphereA = world_.createEntity();
+    TransformComponent transformSphere;
+    transformSphere.position = Vec3{5.0f, 0.0f, 1.0f};
+
+    world_.components().add(sphereA, transformSphere);
+    world_.components().add(sphereA, RenderComponent{sphereMesh_.get(), basicMaterial_.get()});
+    
 }
 
 void Game::createPlayer()

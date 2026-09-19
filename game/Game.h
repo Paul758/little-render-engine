@@ -45,7 +45,8 @@ private:
     std::unique_ptr<ShaderProgram> standardShader_;
     std::unique_ptr<BasicMaterial> basicMaterial_;
     std::unique_ptr<Mesh> cubeMesh_;
-
+    std::unique_ptr<Mesh> sphereMesh_;
+    
     //ECS
     World world_;
 
