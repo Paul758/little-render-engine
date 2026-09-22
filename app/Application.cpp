@@ -22,6 +22,8 @@
 
 #include "engine/graphics/ShaderProgram.h"
 
+#include "engine/assets/AssetManager.h"
+
 Application::Application() = default;
 
 bool Application::initialize()
@@ -80,11 +82,16 @@ bool Application::initialize()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_MULTISAMPLE);
 
+    //Assets
+    assetManager_ = std::make_unique<AssetManager>("assets");
+
     //Initialize Input and Time
     input_ = std::make_unique<Input>(window_);
     time_ = std::make_unique<GameTime>();
-    game_ = std::make_unique<Game>();
+    game_ = std::make_unique<Game>(*assetManager_);
     game_->initialize();
+
+
 
     editor_ = std::make_unique<Editor>(game_->getWorld());
     editor_->initialize();
@@ -98,8 +105,8 @@ bool Application::initialize()
     editorFramebuffer_ = std::make_unique<Framebuffer>(640, 720, TextureFilter::Linear);
     gameFramebuffer_ = std::make_unique<Framebuffer>(640, 720, TextureFilter::Linear);
 
-    screenShader_ = std::make_unique<ShaderProgram>("assets/shaders/screen.vert", "assets/shaders/screen.frag");
-    screenRenderer_ = std::make_unique<ScreenRenderer>(*screenShader_);
+    ShaderProgram& screenShader = assetManager_->loadShader("shaders/screen.vert", "shaders/screen.frag");
+    screenRenderer_ = std::make_unique<ScreenRenderer>(screenShader);
 
     return true;
 }
@@ -184,7 +191,6 @@ void Application::run()
 Application::~Application()
 {
     screenRenderer_.reset();
-    screenShader_.reset();
 
     editorFramebuffer_.reset();
     gameFramebuffer_.reset();
@@ -196,6 +202,8 @@ Application::~Application()
 
     editor_.reset();
     game_.reset();
+    
+    assetManager_.reset();
 
     input_.reset();
     time_.reset();

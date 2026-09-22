@@ -1,7 +1,8 @@
 #pragma once
 
 #include "engine/graphics/materials/Material.h"
-#include "engine/graphics/Texture2D.h"
+
+class Texture2D;
 
 class BasicMaterial : public Material
 {
@@ -17,7 +18,7 @@ public:
 
 public:
     Vec3 albedoColor{1.0f, 1.0f, 1.0f};
-    Texture2D* albedoTexture = nullptr;
+    const Texture2D* albedoTexture = nullptr;
 
     float roughness = 0.5f;
     float metalllic = 0.0f;

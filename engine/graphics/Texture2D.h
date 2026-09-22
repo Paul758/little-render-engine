@@ -4,13 +4,15 @@
 #include<GLFW/glfw3.h>
 #include <string>
 
+#include "engine/assets/ImageData.h"
+
 class Texture2D
 {
 private:
     GLuint textureID_ = 0;
 
 public:
-    explicit Texture2D(const std::string& path);
+    explicit Texture2D(const ImageData& image);
     ~Texture2D();
 
     Texture2D(const Texture2D&) = delete;

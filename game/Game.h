@@ -17,11 +17,12 @@ class BasicMaterial;
 class Mesh;
 
 class Input;
+class AssetManager;
 
 class Game
 {
 public:
-    Game();
+    explicit Game(AssetManager& assets);
     ~Game();
 
     void initialize();
@@ -42,10 +43,12 @@ private:
     Entity player_;
     Entity gameCamera_;
     //Graphics resources
-    std::unique_ptr<ShaderProgram> standardShader_;
     std::unique_ptr<BasicMaterial> basicMaterial_;
     std::unique_ptr<Mesh> cubeMesh_;
     std::unique_ptr<Mesh> sphereMesh_;
+
+    //Assets
+    AssetManager& assets_;
     
     //ECS
     World world_;

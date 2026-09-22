@@ -1,5 +1,6 @@
 #include "engine/graphics/materials/BasicMaterial.h"
 #include "engine/graphics/ShaderProgram.h"
+#include "engine/graphics/Texture2D.h"
 #include "engine/components/lighting/DirectionalLightData.h"
 
 BasicMaterial::BasicMaterial(ShaderProgram& shader) : shader_(&shader)

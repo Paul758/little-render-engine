@@ -19,6 +19,7 @@ class Framebuffer;
 class ScreenRenderer;
 
 class ShaderProgram;
+class AssetManager;
 
 class Application
 {
@@ -46,10 +47,9 @@ private:
 
     std::unique_ptr<Framebuffer> editorFramebuffer_;
     std::unique_ptr<Framebuffer> gameFramebuffer_;
-    std::unique_ptr<ShaderProgram> screenShader_;
     std::unique_ptr<ScreenRenderer> screenRenderer_;
 
     std::unique_ptr<Editor> editor_;
-
-
+    
+    std::unique_ptr<AssetManager> assetManager_;
 };

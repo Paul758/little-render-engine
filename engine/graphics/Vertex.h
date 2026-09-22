@@ -5,7 +5,7 @@
 
 struct Vertex
 {
-    Vec3 position;
-    Vec3 normal;
-    Vec2 texCoord;
+    Vec3 position{};
+    Vec3 normal{};
+    Vec2 texCoord{};
 };

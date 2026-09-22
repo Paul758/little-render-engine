@@ -74,6 +74,7 @@ add_library(LittleRendererEngine STATIC
     engine/graphics/Framebuffer.cpp
     engine/graphics/IndexBuffer.cpp
     engine/graphics/Mesh.cpp
+    engine/graphics/Model.cpp
     engine/graphics/VertexBuffer.cpp
     engine/graphics/VertexArray.cpp
     engine/graphics/PrimitiveMesh.cpp
@@ -88,10 +89,16 @@ add_library(LittleRendererEngine STATIC
     engine/math/Mat4.cpp
     engine/math/Vec3.cpp
     engine/math/Vec2.cpp
+    engine/math/Vec4.cpp
 
     # Core
     engine/core/input/Input.cpp
     engine/core/time/GameTime.cpp
+
+    # Asset Manager
+    engine/assets/AssetManager.cpp
+    engine/assets/TextureLoader.cpp
+    engine/assets/ModelLoader.cpp
 
     # Components
     engine/components/TransformComponent.cpp
@@ -114,6 +121,9 @@ add_library(LittleRendererEngine STATIC
     engine/behaviour/composites/Sequence.cpp
     engine/behaviour/composites/Selector.cpp
     engine/behaviour/composites/EvaluateAll.cpp
+
+    # TinyGltf
+    engine/assets/TinyGltfImplementation.cpp
 )
 
 target_include_directories(
@@ -124,6 +134,8 @@ target_include_directories(
 
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/external/stb
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/tinygltf
 )
 
 target_link_libraries(LittleRendererEngine
@@ -231,6 +243,9 @@ add_executable(
     tests/behaviour/composites/EvaluateAllTest.cpp
     tests/behaviour/player/PlayerMovementNodesTest.cpp
 
+    tests/engine/assets/AssetManagerTest.cpp
+    tests/engine/assets/ModelLoaderTest.cpp
+    tests/helpers/OpenGLTestContext.cpp
 
 
     tests/fakes/FakeInput.h
@@ -250,11 +265,18 @@ target_include_directories(LittleRendererTests
         ${CMAKE_CURRENT_SOURCE_DIR}/tests
 )
 
+target_compile_definitions(
+    LittleRendererTests
+    PRIVATE
+    TEST_ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"    
+)
+
 include(CTest)
 include(Catch)
 
 catch_discover_tests(
     LittleRendererTests
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
 #--------------------

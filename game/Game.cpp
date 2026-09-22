@@ -12,6 +12,7 @@
 #include "engine/graphics/PrimitiveMesh.h"
 #include "engine/graphics/ShaderProgram.h"
 #include "engine/graphics/materials/BasicMaterial.h"
+#include "engine/graphics/Model.h"
 
 #include "game/components/PlayerInputComponent.h"
 #include "game/components/LocomotionIntentComponent.h"
@@ -22,10 +23,13 @@
 
 #include "engine/math/Vec3.h"
 
+#include "engine/assets/AssetManager.h"
+
 #include <vector>
 
-Game::Game()
-    : playerInputSystem_(world_.components()),
+Game::Game(AssetManager& assets)
+    : assets_(assets),
+      playerInputSystem_(world_.components()),
       behaviourTreeSystem_(world_.components(), behaviourTreeRegistry_),
       intentResetSystem_(world_.components()),
       locomotionSystem_(world_.components()),
@@ -48,14 +52,27 @@ void Game::initialize()
 void Game::createScene()
 {
     //Resources
-    standardShader_ = std::make_unique<ShaderProgram>("assets/shaders/standard.vert", "assets/shaders/standard.frag");
-    basicMaterial_ = std::make_unique<BasicMaterial>(*standardShader_);
+    ShaderProgram& standardShader = assets_.loadShader("shaders/standard.vert", "shaders/standard.frag");
+    basicMaterial_ = std::make_unique<BasicMaterial>(standardShader);
 
-    basicMaterial_->albedoColor = Vec3{0.7f, 0.7f, 0.2f};
+    basicMaterial_->albedoColor = Vec3{1.0f, 1.0f, 1.0f};
+    Texture2D& brick = assets_.loadTexture("textures/brick.png");
+    basicMaterial_->albedoTexture = &brick;
 
-    MeshData cubeData = PrimitiveMesh::cube();
+    Model& cubeModel = assets_.loadModel("models/cube.glb", standardShader);
+    if (cubeModel.getMeshCount() == 0)
+    {
+        throw std::runtime_error("cube.glb contains no meshes");
+    }
 
-    cubeMesh_ = std::make_unique<Mesh>(cubeData);
+    const int materialIndex = cubeModel.getMaterialIndex(0);
+    if (materialIndex < 0)
+    {
+        throw std::runtime_error("Imported cube has no material");
+    }
+
+    Mesh& cubeMesh = cubeModel.getMesh(0);
+    Material& cubeMaterial = cubeModel.getMaterial(static_cast<std::size_t>(materialIndex));
 
     Entity cubeA = world_.createEntity();
     Entity cubeB = world_.createEntity();
@@ -65,9 +82,9 @@ void Game::createScene()
     world_.components().add(cubeB, TransformComponent{});
     world_.components().add(cubeC, TransformComponent{});
 
-    world_.components().add(cubeA, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
-    world_.components().add(cubeB, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
-    world_.components().add(cubeC, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
+    world_.components().add(cubeA, RenderComponent{&cubeMesh, &cubeMaterial});
+    //world_.components().add(cubeB, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
+    //world_.components().add(cubeC, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
 
     MeshData sphereData = PrimitiveMesh::sphere(8, 4);
     sphereMesh_ = std::make_unique<Mesh>(sphereData);
