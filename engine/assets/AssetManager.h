@@ -20,7 +20,7 @@ public:
 
     Texture2D& loadTexture(const Path& path);
     ShaderProgram& loadShader(const Path& vertexPath, const Path& fragmentPath);
-    Model& loadModel(const Path& path, ShaderProgram& shader);
+    Model& loadModel(const Path& path);
 
 private:
     Path normalizeAssetPath(const Path& path);

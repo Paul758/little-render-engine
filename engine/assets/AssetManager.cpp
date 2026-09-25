@@ -12,6 +12,12 @@
 #include "engine/graphics/materials/BasicMaterial.h"
 #include "engine/graphics/materials/Material.h"
 
+namespace
+{
+    constexpr const char* StandardVertexShader = "shaders/standard.vert";
+    constexpr const char* StandardFragmentShader = "shaders/standard.frag";
+}
+
 AssetManager::AssetManager(Path assetRoot)
     : assetRoot_(std::move(assetRoot).lexically_normal())
 {
@@ -78,7 +84,7 @@ ShaderProgram& AssetManager::loadShader(const Path& vertexPath, const Path& frag
     return result;
 }
 
-Model& AssetManager::loadModel(const Path& path, ShaderProgram& shader)
+Model& AssetManager::loadModel(const Path& path)
 {
     const Path assetPath = normalizeAssetPath(path);
 
@@ -89,15 +95,31 @@ Model& AssetManager::loadModel(const Path& path, ShaderProgram& shader)
         return *it->second;
     }
 
+    ShaderProgram& shader = loadShader(StandardVertexShader, StandardFragmentShader);
+
     const Path fullPath = assetRoot_ / assetPath;
 
     ModelData data = ModelLoader::load(fullPath);
 
     auto model = std::make_unique<Model>();
 
-    for (const ImageData& imageData : data.images)
+    for (const TextureData& textureData : data.textures)
     {
-        auto texture = std::make_unique<Texture2D>(imageData);
+        if (textureData.imageIndex < 0)
+        {
+            throw std::runtime_error ("Model texture has no source image");
+        }
+        
+        const ImageData& imageData = data.images.at(static_cast<std::size_t>(textureData.imageIndex));
+
+        SamplerData sampler;
+
+        if (textureData.samplerIndex >= 0)
+        {
+            sampler = data.samplers.at(static_cast<std::size_t>(textureData.samplerIndex));
+        }
+
+        auto texture = std::make_unique<Texture2D>(imageData, sampler);
 
         model->addTexture(std::move(texture));
     }
@@ -112,21 +134,34 @@ Model& AssetManager::loadModel(const Path& path, ShaderProgram& shader)
             materialData.baseColor.z
         };
 
-        if (materialData.baseColorImageIndex >= 0)
+        if (materialData.baseColorTextureIndex >= 0)
         {
-            Texture2D& texture = model->getTexture(static_cast<std::size_t>(materialData.baseColorImageIndex));
+            Texture2D& texture = model->getTexture(static_cast<std::size_t>(materialData.baseColorTextureIndex));
             material->albedoTexture = &texture;
         }
 
         model->addMaterial(std::move(material));
     }
 
-    for (const ModelMeshData& modelMeshData : data.meshes)
+    for (const ModelMeshData& meshData : data.meshes)
     {
-        auto mesh = std::make_unique<Mesh>(modelMeshData.mesh);
+        ModelMesh modelMesh;
 
-        model->addMesh(std::move(mesh), modelMeshData.materialIndex);
+        for (const ModelPrimitiveData& primitiveData : meshData.primitives)
+        {
+            ModelPrimitive primitive;
+
+            primitive.mesh = std::make_unique<Mesh>(primitiveData.mesh);
+            primitive.materialIndex = primitiveData.materialIndex;
+
+            modelMesh.primitives.push_back(std::move(primitive));
+        }
+
+        model->addMesh(std::move(modelMesh));
     }
+
+    model->setNodes(std::move(data.nodes));
+    model->setRootNodes(std::move(data.rootNodes));
 
     Model& result = *model;
 

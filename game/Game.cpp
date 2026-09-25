@@ -35,14 +35,16 @@ Game::Game(AssetManager& assets)
       locomotionSystem_(world_.components()),
       actionResolver_(world_.components()),
       integrationSystem_(world_.components()),
-      fixedOrbitCameraSystem_(world_.components())
+      fixedOrbitCameraSystem_(world_.components()),
+      hierarchySystem_(world_.components()),
+      transformSystem_(world_.components(), hierarchySystem_)
 {
 }
 
 void Game::initialize()
 {
-    createScene();
     createPlayer();
+    createScene();
     createCamera();
     createLight();
     
@@ -59,32 +61,30 @@ void Game::createScene()
     Texture2D& brick = assets_.loadTexture("textures/brick.png");
     basicMaterial_->albedoTexture = &brick;
 
-    Model& cubeModel = assets_.loadModel("models/cube.glb", standardShader);
+    Model& cubeModel = assets_.loadModel("models/cube.glb");
     if (cubeModel.getMeshCount() == 0)
     {
         throw std::runtime_error("cube.glb contains no meshes");
     }
 
-    const int materialIndex = cubeModel.getMaterialIndex(0);
-    if (materialIndex < 0)
-    {
-        throw std::runtime_error("Imported cube has no material");
-    }
-
-    Mesh& cubeMesh = cubeModel.getMesh(0);
-    Material& cubeMaterial = cubeModel.getMaterial(static_cast<std::size_t>(materialIndex));
-
     Entity cubeA = world_.createEntity();
     Entity cubeB = world_.createEntity();
-    Entity cubeC = world_.createEntity();
 
-    world_.components().add(cubeA, TransformComponent{});
-    world_.components().add(cubeB, TransformComponent{});
-    world_.components().add(cubeC, TransformComponent{});
+    ModelMesh& cubeModelMesh = cubeModel.getMesh(0);
+    ModelPrimitive& cubePrimitive = cubeModelMesh.primitives.at(0);
 
-    world_.components().add(cubeA, RenderComponent{&cubeMesh, &cubeMaterial});
-    //world_.components().add(cubeB, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
-    //world_.components().add(cubeC, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
+    if (cubePrimitive.materialIndex >= 0)
+    {
+        Mesh& cubeMesh = *cubePrimitive.mesh;
+        Material& cubeMaterial = cubeModel.getMaterial(static_cast<std::size_t>(cubePrimitive.materialIndex));
+        world_.components().add(cubeA, RenderComponent{&cubeMesh, &cubeMaterial});
+        world_.components().add(cubeB, RenderComponent{&cubeMesh, &cubeMaterial});
+    }
+
+    TransformComponent cubeATransform;
+    cubeATransform.position = Vec3{-2.0f, 0.0f, -2.0f};
+    world_.components().add(cubeA, cubeATransform);
+
 
     MeshData sphereData = PrimitiveMesh::sphere(8, 4);
     sphereMesh_ = std::make_unique<Mesh>(sphereData);
@@ -96,14 +96,33 @@ void Game::createScene()
     world_.components().add(sphereA, transformSphere);
     world_.components().add(sphereA, RenderComponent{sphereMesh_.get(), basicMaterial_.get()});
     
+    hierarchySystem_.setParent(cubeA, player_);
 }
 
 void Game::createPlayer()
 {
     player_ = world_.createEntity();
 
-    world_.components().add(player_, TransformComponent{});
-    world_.components().add(player_, RenderComponent{cubeMesh_.get(), basicMaterial_.get()});
+    Model& cubeModel = assets_.loadModel("models/cube.glb");
+    if (cubeModel.getMeshCount() == 0)
+    {
+        throw std::runtime_error("cube.glb contains no meshes");
+    }
+
+    ModelMesh& cubeModelMesh = cubeModel.getMesh(0);
+    ModelPrimitive& cubePrimitive = cubeModelMesh.primitives.at(0);
+
+    if (cubePrimitive.materialIndex >= 0)
+    {
+        Mesh& cubeMesh = *cubePrimitive.mesh;
+        Material& cubeMaterial = cubeModel.getMaterial(static_cast<std::size_t>(cubePrimitive.materialIndex));
+        world_.components().add(player_, RenderComponent{&cubeMesh, &cubeMaterial});
+    }
+
+    TransformComponent playerTransform;
+    playerTransform.position = Vec3{1.0f, 0.0f, -1.0f};
+
+    world_.components().add(player_, playerTransform);
     world_.components().add(player_, PlayerInputComponent{});
     world_.components().add(player_, LocomotionIntentComponent{});
     world_.components().add(player_, VelocityComponent{});
@@ -179,6 +198,11 @@ void Game::update(const Input& input, float deltaTime)
 
     fixedOrbitCameraSystem_.update(input, gameCamera_, deltaTime);
 
+    TransformComponent* playerTransform = world_.components().get<TransformComponent>(player_);
+    hierarchyTestAngle += deltaTime * 10.0f;
+    playerTransform->rotation = Quaternion::fromAxisAngle(Vec3{0.0f, 1.0f, 0.0f}, hierarchyTestAngle);
+
+    transformSystem_.update();
 }
 
 Entity Game::getCamera() const

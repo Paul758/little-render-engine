@@ -16,8 +16,9 @@ TEST_CASE("ModelLoader extracts vertex positions")
     ModelData model = ModelLoader::load("assets/models/cube.glb");
 
     REQUIRE_FALSE(model.meshes.empty());
+    REQUIRE_FALSE(model.meshes[0].primitives.empty());
 
-    const MeshData& mesh = model.meshes[0].mesh;
+    const MeshData& mesh = model.meshes[0].primitives[0].mesh;
 
     REQUIRE_FALSE(mesh.vertices.empty());
 }
@@ -27,8 +28,10 @@ TEST_CASE("ModelLoader extracts vertex normals")
     ModelData model = ModelLoader::load("assets/models/cube.glb");
 
     REQUIRE_FALSE(model.meshes.empty());
+    REQUIRE_FALSE(model.meshes[0].primitives.empty());
 
-    const MeshData& mesh = model.meshes[0].mesh;
+    const MeshData& mesh = model.meshes[0].primitives[0].mesh;
+
 
     REQUIRE_FALSE(mesh.vertices.empty());
 
@@ -53,8 +56,10 @@ TEST_CASE("ModelLoader extracts texture coordinates")
     ModelData model = ModelLoader::load("assets/models/cube.glb");
 
     REQUIRE_FALSE(model.meshes.empty());
+    REQUIRE_FALSE(model.meshes[0].primitives.empty());
 
-    const MeshData& mesh = model.meshes[0].mesh;
+    const MeshData& mesh = model.meshes[0].primitives[0].mesh;
+
 
     REQUIRE_FALSE(mesh.vertices.empty());
 
@@ -79,8 +84,10 @@ TEST_CASE("ModelLoader extracts indices")
     ModelData model = ModelLoader::load("assets/models/cube.glb");
 
     REQUIRE_FALSE(model.meshes.empty());
+    REQUIRE_FALSE(model.meshes[0].primitives.empty());
 
-    const MeshData& mesh = model.meshes[0].mesh;
+    const MeshData& mesh = model.meshes[0].primitives[0].mesh;
+
 
     REQUIRE_FALSE(mesh.indices.empty());
 }
@@ -90,8 +97,10 @@ TEST_CASE("ModelLoader produces valid vertex indices")
     ModelData model = ModelLoader::load("assets/models/cube.glb");
 
     REQUIRE_FALSE(model.meshes.empty());
+    REQUIRE_FALSE(model.meshes[0].primitives.empty());
 
-    const MeshData& mesh = model.meshes[0].mesh;
+    const MeshData& mesh = model.meshes[0].primitives[0].mesh;
+
 
     REQUIRE_FALSE(mesh.vertices.empty());
     REQUIRE_FALSE(mesh.indices.empty());
@@ -107,7 +116,10 @@ TEST_CASE("ModelLoader produces triangle indices")
     ModelData model = ModelLoader::load("assets/models/cube.glb");
 
     REQUIRE_FALSE(model.meshes.empty());
-    const MeshData& mesh = model.meshes[0].mesh;
+    REQUIRE_FALSE(model.meshes[0].primitives.empty());
+
+    const MeshData& mesh = model.meshes[0].primitives[0].mesh;
+
 
     REQUIRE_FALSE(mesh.indices.empty());
 
@@ -132,10 +144,14 @@ TEST_CASE("ModelLoader produces valid material indices")
 
     for (const ModelMeshData& mesh : model.meshes)
     {
-        if (mesh.materialIndex >= 0)
+        for (const ModelPrimitiveData& primitive : mesh.primitives)
         {
-            REQUIRE(static_cast<std::size_t>(mesh.materialIndex) < model.materials.size());
+            if (primitive.materialIndex >= 0)
+            {
+                REQUIRE(static_cast<std::size_t>(primitive.materialIndex) < model.materials.size());
+            }
         }
+        
     }
 }
 
@@ -153,16 +169,101 @@ TEST_CASE("ModelLoader extracts model images")
 
 }
 
-TEST_CASE("ModelLoader produces valid base color image indices")
+TEST_CASE("ModelLoader produces valid base color texture indices")
 {
     ModelData model = ModelLoader::load("assets/models/cube.glb");
 
     for (const MaterialData& material : model.materials)
     {
-        if (material.baseColorImageIndex >= 0)
+        if (material.baseColorTextureIndex >= 0)
         {
-            REQUIRE(static_cast<std::size_t>(material.baseColorImageIndex) < model.images.size());
+            REQUIRE(static_cast<std::size_t>(material.baseColorTextureIndex) < model.textures.size());
+        }
+    }
+}
+
+TEST_CASE("ModelLoader produces valid base color image indices")
+{
+    ModelData model = ModelLoader::load("assets/models/cube.glb");
+
+    for (const TextureData& texture : model.textures)
+    {
+        if (texture.imageIndex >= 0)
+        {
+            REQUIRE(static_cast<std::size_t>(texture.imageIndex) < model.images.size());
             
         }
+    }
+}
+
+TEST_CASE("ModelLoader produces valid texture sampler indices")
+{
+    ModelData model = ModelLoader::load("assets/models/cube.glb");
+
+    for (const TextureData& texture : model.textures)
+    {
+        if (texture.samplerIndex >= 0)
+        {
+            REQUIRE(static_cast<std::size_t>(texture.samplerIndex) < model.samplers.size());
+        }
+    }
+}
+
+TEST_CASE("ModelLoader loads model nodes")
+{
+    ModelData model = ModelLoader::load("assets/models/cube.glb");
+
+    REQUIRE_FALSE(model.nodes.empty());
+}
+
+TEST_CASE("ModelLoader produces valid node mesh indices")
+{
+    ModelData model = ModelLoader::load("assets/models/cube.glb");
+
+    for (const NodeData& node : model.nodes)
+    {
+        if (node.meshIndex >= 0)
+        {
+            REQUIRE(static_cast<std::size_t>(node.meshIndex) < model.meshes.size());
+        }
+    }
+
+    REQUIRE_FALSE(model.nodes.empty());
+}
+
+TEST_CASE("ModelLoader extracts mesh primitives")
+{
+    ModelData model = ModelLoader::load("assets/models/cube.glb");
+
+    REQUIRE_FALSE(model.meshes.empty());
+    
+    for (const ModelMeshData& mesh : model.meshes)
+    {
+        REQUIRE_FALSE(mesh.primitives.empty());
+    }
+}
+
+TEST_CASE("ModelLoader produces valid node child indices")
+{
+    ModelData model = ModelLoader::load("assets/models/cube.glb");
+
+    for (const NodeData& node : model.nodes)
+    {
+        for (std::size_t childIndex : node.children)
+        {
+            REQUIRE(childIndex < model.nodes.size());
+        }
+    }
+}
+
+TEST_CASE("ModelLoader loads scene root nodes")
+{
+    ModelData model = ModelLoader::load("assets/models/cube.glb");
+
+    REQUIRE_FALSE(model.rootNodes.empty());
+
+    for (std::size_t rootNodeIndex : model.rootNodes)
+    {
+        REQUIRE(rootNodeIndex < model.nodes.size());
     }
 }

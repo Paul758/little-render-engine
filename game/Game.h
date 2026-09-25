@@ -3,6 +3,8 @@
 #include "engine/core/ecs/World.h"
 #include "engine/behaviour/BehaviourTreeRegistry.h"
 #include "engine/systems/BehaviourTreeSystem.h"
+#include "engine/systems/HierarchySystem.h"
+#include "engine/systems/TransformSystem.h"
 
 #include "game/systems/PlayerInputSystem.h"
 #include "game/systems/IntentResetSystem.h"
@@ -41,6 +43,7 @@ private:
 
 private:
     Entity player_;
+    float hierarchyTestAngle = 0.0f;
     Entity gameCamera_;
     //Graphics resources
     std::unique_ptr<BasicMaterial> basicMaterial_;
@@ -52,6 +55,10 @@ private:
     
     //ECS
     World world_;
+
+    // Hierarchy and Transform
+    HierarchySystem hierarchySystem_;
+    TransformSystem transformSystem_;
 
     FixedOrbitCameraSystem fixedOrbitCameraSystem_;
     //Behaviour
@@ -65,4 +72,5 @@ private:
     ActionResolver actionResolver_;
     IntegrationSystem integrationSystem_;
     CommandBuffer commandBuffer_;
+
 };

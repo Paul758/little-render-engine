@@ -1,3 +1,6 @@
+
+#include <utility>
+
 #include "engine/graphics/Model.h"
 #include "engine/graphics/Mesh.h"
 #include "engine/assets/ModelData.h"
@@ -13,13 +16,9 @@ void Model::addMaterial(std::unique_ptr<Material> material)
     materials_.push_back(std::move(material));
 }
 
-void Model::addMesh(std::unique_ptr<Mesh> mesh, int materialIndex)
+void Model::addMesh(ModelMesh mesh)
 {
-    ModelMesh modelMesh;
-    modelMesh.mesh = std::move(mesh);
-    modelMesh.materialIndex = materialIndex;
-
-    meshes_.push_back(std::move(modelMesh));
+    meshes_.push_back(std::move(mesh));
 }
 
 void Model::addTexture(std::unique_ptr<Texture2D> texture)
@@ -37,14 +36,14 @@ std::size_t Model::getMaterialCount() const
     return materials_.size();
 }
 
-Mesh& Model::getMesh(std::size_t index)
+ModelMesh& Model::getMesh(std::size_t index)
 {
-    return *meshes_.at(index).mesh;
+    return meshes_.at(index);
 }
 
-const Mesh& Model::getMesh(std::size_t index) const
+const ModelMesh& Model::getMesh(std::size_t index) const
 {
-    return *meshes_.at(index).mesh;
+    return meshes_.at(index);
 }
 
 Material& Model::getMaterial(std::size_t index)
@@ -67,7 +66,22 @@ const Texture2D& Model::getTexture(std::size_t index) const
     return *textures_.at(index);
 }
 
-int Model::getMaterialIndex(std::size_t index) const
+const std::vector<NodeData>& Model::getNodes() const
 {
-    return meshes_.at(index).materialIndex;
+    return nodes_;
+}
+
+const std::vector<std::size_t>& Model::getRootNodes() const
+{
+    return rootNodes_;
+}
+
+void Model::setNodes(std::vector<NodeData> nodes)
+{
+    nodes_ = std::move(nodes);
+}
+
+void Model::setRootNodes(std::vector<std::size_t> rootNodes)
+{
+    rootNodes_ = std::move(rootNodes);
 }

@@ -2,10 +2,11 @@
 #include "engine/graphics/MeshData.h"
 #include "engine/assets/ModelData.h"
 #include "engine/assets/ImageData.h"
+#include "engine/assets/NodeData.h"
 
 #include <stdexcept>
 #include <string>
-
+#include <vector>
 #include <tiny_gltf.h>
 #include <iostream>
 #include <utility>
@@ -35,6 +36,60 @@ namespace
         }
 
         return AccessorData{data, accessor.count, static_cast<std::size_t>(byteStride)};
+    }
+
+    TextureWrap getTextureWrap(int wrap, const std::filesystem::path& path)
+    {
+        switch (wrap)
+        {
+            case TINYGLTF_TEXTURE_WRAP_REPEAT:
+                return TextureWrap::Repeat;
+            
+            case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
+                return TextureWrap::MirroredRepeat;
+            
+            case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
+                return TextureWrap::ClampToEdge;
+            
+            default:
+                throw std::runtime_error("Unsupported texture wrap mode in: " + path.string());
+        }
+    }
+
+    TextureFilter getTextureFilter(int filter, const std::filesystem::path& path)
+    {
+        switch (filter)
+        {
+            case TINYGLTF_TEXTURE_FILTER_NEAREST:
+                return TextureFilter::Nearest;
+            
+            case TINYGLTF_TEXTURE_FILTER_LINEAR:
+                return TextureFilter::Linear;
+            
+            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
+                return TextureFilter::NearestMipmapNearest;
+
+            case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST:
+                return TextureFilter::LinearMipmapNearest;
+            
+            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
+                return TextureFilter::NearestMipmapLinear;
+            
+            case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
+                return TextureFilter::LinearMipmapLinear;
+            
+            default:
+                throw std::runtime_error("Unsupported texture filter in: " + path.string());
+        }       
+    }
+
+    template<typename T>
+    void validateIndex(int index, const std::vector<T>& items, const char* description, const std::filesystem::path& path)
+    {
+        if (index < 0 || static_cast<std::size_t>(index) >= items.size())
+        {
+            throw std::runtime_error(std::string("Invalid") + description + " index in: " + path.string());
+        }
     }
 }
 
@@ -89,6 +144,8 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
 
     for (const tinygltf::Mesh& gltfMesh : gltfModel.meshes)
     {
+        ModelMeshData modelMeshData;
+
         for (const tinygltf::Primitive& primitive : gltfMesh.primitives)
         {
             if (primitive.mode != TINYGLTF_MODE_TRIANGLES)
@@ -96,7 +153,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
                 throw std::runtime_error("Only triangle primitives are currently supported in: " + path.string());
             }
 
-            MeshData meshData;
+            MeshData primitiveMeshData;
 
             // POSITION
 
@@ -116,7 +173,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
 
             const AccessorData positionData = getAccessorData(gltfModel, positionAccessor, path);
 
-            meshData.vertices.resize(positionData.count);
+            primitiveMeshData.vertices.resize(positionData.count);
 
             for (std::size_t i = 0; i < positionData.count; ++i)
             {
@@ -124,7 +181,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
 
                 const float* position = reinterpret_cast<const float*>(vertexData);
 
-                meshData.vertices[i].position = Vec3{position[0], position[1], position[2]};
+                primitiveMeshData.vertices[i].position = Vec3{position[0], position[1], position[2]};
             }
 
             // NORMAL
@@ -140,7 +197,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
                     throw std::runtime_error("Unsupported NORMAL format in: " + path.string());
                 }
 
-                if (normalAccessor.count != meshData.vertices.size())
+                if (normalAccessor.count != primitiveMeshData.vertices.size())
                 {
                     throw std::runtime_error("NORMAL count does not match POSITION count in: " + path.string());
                 }
@@ -153,7 +210,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
 
                     const float* normal = reinterpret_cast<const float*>(normalVertexData);
 
-                    meshData.vertices[i].normal = Vec3{
+                    primitiveMeshData.vertices[i].normal = Vec3{
                         normal[0],
                         normal[1],
                         normal[2]
@@ -173,7 +230,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
                     throw std::runtime_error("Unsupported TEXCOORD_0 format in: " + path.string());
                 }
 
-                if (texCoordAccessor.count != meshData.vertices.size())
+                if (texCoordAccessor.count != primitiveMeshData.vertices.size())
                 {
                     throw std::runtime_error("TEXCOORD_0 count does not match POSITION count in: " + path.string());
                 }
@@ -186,7 +243,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
 
                     const float* texCoord = reinterpret_cast<const float*>(vertexData);
 
-                    meshData.vertices[i].texCoord = Vec2{texCoord[0], texCoord[1]};
+                    primitiveMeshData.vertices[i].texCoord = Vec2{texCoord[0], texCoord[1]};
                 }
             }
 
@@ -208,7 +265,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
             const tinygltf::Buffer& indexBuffer = gltfModel.buffers[indexBufferView.buffer];
 
             const unsigned char* indexData = indexBuffer.data.data() + indexBufferView.byteOffset + indexAccessor.byteOffset;
-            meshData.indices.resize(indexAccessor.count);
+            primitiveMeshData.indices.resize(indexAccessor.count);
 
             switch (indexAccessor.componentType)
             {
@@ -218,7 +275,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
                     {
                         const std::uint8_t* index = reinterpret_cast<const std::uint8_t*>(indexData + i * sizeof(std::uint8_t));
 
-                        meshData.indices[i] = static_cast<std::uint32_t>(*index);
+                        primitiveMeshData.indices[i] = static_cast<std::uint32_t>(*index);
                     }
 
                     break;
@@ -229,7 +286,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
                     {
                         const std::uint16_t* index = reinterpret_cast<const std::uint16_t*>(indexData + i * sizeof(std::uint16_t));
 
-                        meshData.indices[i] = static_cast<std::uint32_t>(*index);
+                        primitiveMeshData.indices[i] = static_cast<std::uint32_t>(*index);
                     }
                     
                     break;
@@ -240,7 +297,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
                     {
                         const std::uint32_t* index = reinterpret_cast<const std::uint32_t*>(indexData + i * sizeof(std::uint32_t));
 
-                        meshData.indices[i] = *index;
+                        primitiveMeshData.indices[i] = *index;
                     }
 
                     break;
@@ -250,12 +307,18 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
                     throw std::runtime_error("Unsupported index component type in: " + path.string());
                 }
             }
-            ModelMeshData modelMeshData;
-            modelMeshData.mesh = std::move(meshData);
-            modelMeshData.materialIndex = primitive.material;
+            ModelPrimitiveData primitiveData;
+            primitiveData.mesh = std::move(primitiveMeshData);
+            primitiveData.materialIndex = primitive.material;
 
-            result.meshes.push_back(std::move(modelMeshData)); 
+            if (primitive.material >= 0)
+            {
+                validateIndex(primitive.material, gltfModel.materials, "primitive material", path);
+            }
+
+            modelMeshData.primitives.push_back(std::move(primitiveData));
         }
+        result.meshes.push_back(std::move(modelMeshData));
     }
 
     for (const tinygltf::Material& gltfMaterial : gltfModel.materials)
@@ -279,7 +342,13 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
         if (textureIndex >= 0)
         {
             const tinygltf::Texture& texture = gltfModel.textures[textureIndex];
-            materialData.baseColorImageIndex = texture.source;
+            materialData.baseColorTextureIndex  = gltfMaterial.pbrMetallicRoughness.baseColorTexture.index;
+
+            if (materialData.baseColorTextureIndex >= 0)
+            {
+                validateIndex(materialData.baseColorTextureIndex, gltfModel.textures, "base color texture", path);
+            }
+
         }
 
         for (const tinygltf::Image& gltfImage : gltfModel.images)
@@ -293,8 +362,116 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
             result.images.push_back(std::move(imageData));
         }
 
+        for (const tinygltf::Texture& gltfTexture : gltfModel.textures)
+        {
+            TextureData textureData;
+
+            textureData.imageIndex = gltfTexture.source;
+            textureData.samplerIndex = gltfTexture.sampler;
+
+            validateIndex(textureData.imageIndex, gltfModel.images, "texture image", path);
+
+            if (textureData.samplerIndex >= 0)
+            {
+                validateIndex(textureData.samplerIndex, gltfModel.samplers, "texture sampler", path);
+            }
+
+            result.textures.push_back(textureData);
+        }
+
         result.materials.push_back(std::move(materialData));
     }
+
+    for (const tinygltf::Sampler& gltfSampler : gltfModel.samplers)
+    {
+        SamplerData samplerData;
+
+        if (gltfSampler.minFilter >= 0)
+        {
+            samplerData.minFilter = getTextureFilter(gltfSampler.minFilter, path);
+        }
+
+        if (gltfSampler.magFilter >= 0)
+        {
+            samplerData.magFilter = getTextureFilter(gltfSampler.magFilter, path);
+        }
+
+        samplerData.wrapS = getTextureWrap(gltfSampler.wrapS, path);
+        samplerData.wrapT = getTextureWrap(gltfSampler.wrapT, path);
+
+        result.samplers.push_back(samplerData);
+    }
+
+    for (const tinygltf::Node& gltfNode : gltfModel.nodes)
+    {
+        NodeData nodeData;
+        nodeData.meshIndex = gltfNode.mesh;
+
+        if (nodeData.meshIndex >= 0)
+        {
+            validateIndex(nodeData.meshIndex, gltfModel.meshes, "node mesh", path);
+        }
+
+        if (gltfNode.translation.size() == 3)
+        {
+            nodeData.translation = Vec3 {
+                static_cast<float>(gltfNode.translation[0]),
+                static_cast<float>(gltfNode.translation[1]),
+                static_cast<float>(gltfNode.translation[2])
+            };
+        }
+
+        if (gltfNode.scale.size() == 3)
+        {
+            nodeData.scale = Vec3 {
+                static_cast<float>(gltfNode.scale[0]),
+                static_cast<float>(gltfNode.scale[1]),
+                static_cast<float>(gltfNode.scale[2])
+            };
+        }
+
+        if (gltfNode.rotation.size() == 4)
+        {
+            nodeData.rotation = Quaternion{
+                static_cast<float>(gltfNode.rotation[3]), //w
+                static_cast<float>(gltfNode.rotation[0]), //x
+                static_cast<float>(gltfNode.rotation[1]), //y
+                static_cast<float>(gltfNode.rotation[2])  //z
+            };
+        }
+
+        for (int childIndex : gltfNode.children)
+        {
+            validateIndex(childIndex, gltfModel.nodes, "node child", path);
+
+            nodeData.children.push_back(static_cast<size_t>(childIndex));
+        }
+
+        result.nodes.push_back(nodeData);
+    }
+
+    int sceneIndex = gltfModel.defaultScene;
+
+    if (sceneIndex < 0 && !gltfModel.scenes.empty())
+    {
+        sceneIndex = 0;
+    }
+
+    if (sceneIndex >= 0)
+    {
+        validateIndex(sceneIndex, gltfModel.scenes, "scene", path);
+
+        const tinygltf::Scene& scene = gltfModel.scenes[sceneIndex];
+
+        for (int rootNodeIndex : scene.nodes)
+        {
+            validateIndex(rootNodeIndex, gltfModel.nodes, "scene root node", path);
+
+            result.rootNodes.push_back(static_cast<std::size_t>(rootNodeIndex));
+        }
+    }
+
+
 
     return result;
 }

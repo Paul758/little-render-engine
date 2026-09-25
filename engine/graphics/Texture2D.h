@@ -6,6 +6,8 @@
 
 #include "engine/assets/ImageData.h"
 
+struct SamplerData;
+
 class Texture2D
 {
 private:
@@ -13,6 +15,7 @@ private:
 
 public:
     explicit Texture2D(const ImageData& image);
+    Texture2D(const ImageData& image, const SamplerData& sampler);
     ~Texture2D();
 
     Texture2D(const Texture2D&) = delete;

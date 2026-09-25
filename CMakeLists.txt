@@ -115,6 +115,8 @@ add_library(LittleRendererEngine STATIC
     engine/systems/EditorCameraUpdateSystem.cpp
     engine/systems/EditorCameraInputSystem.cpp
     engine/systems/LightingSystem.cpp
+    engine/systems/HierarchySystem.cpp
+    engine/systems/TransformSystem.cpp
 
     # Behaviour
     engine/behaviour/BehaviourTree.cpp
@@ -235,6 +237,8 @@ add_executable(
     tests/ActionResolverTest.cpp
     tests/LocomotionSystemTest.cpp
     tests/CameraSystemTest.cpp
+    tests/engine/systems/HierarchySystemTest.cpp
+    tests/engine/systems/TransformSystemTest.cpp
 
     tests/behaviour/BehaviourTreeRegistryTest.cpp
     tests/behaviour/BehaviourTreeSystemTest.cpp

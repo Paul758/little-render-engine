@@ -48,6 +48,30 @@ public:
         return &components[componentIndex];
     }
 
+    const T* get(Entity entity) const
+    {
+        auto it = entityToIndex.find(entity.index);
+
+        if (it == entityToIndex.end())
+        {
+            return nullptr;
+        }
+
+        const std::size_t componentIndex = it->second;
+
+        if (componentIndex >= entities.size())
+        {
+            return nullptr;
+        }
+
+        if (entities[componentIndex] != entity)
+        {
+            return nullptr;
+        }
+
+        return &components[componentIndex];
+    }
+
     bool has(Entity entity) const
     {
         auto it = entityToIndex.find(entity.index);

@@ -6,5 +6,5 @@ struct MaterialData
 {
     Vec4 baseColor = {1.0f, 1.0f, 1.0f, 1.0f};
 
-    int baseColorImageIndex = -1;
+    int baseColorTextureIndex = -1;
 };

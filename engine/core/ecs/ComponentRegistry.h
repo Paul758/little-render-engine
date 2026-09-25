@@ -35,7 +35,24 @@ public:
     }
 
     template<typename T>
-    bool has(Entity entity)
+    const T* get(Entity entity) const
+    {
+        const std::type_index type = typeid(T);
+
+        auto it = componentPools.find(type);
+
+        if (it == componentPools.end())
+        {
+            return nullptr;
+        }
+
+        const auto* pool = static_cast<const ComponentPool<T>*>(it -> second.get());
+
+        return pool->get(entity);
+    }
+
+    template<typename T>
+    bool has(Entity entity) const
     {
         return get<T>(entity) != nullptr;
     }
@@ -48,7 +65,6 @@ public:
         }
     }
 
-    //Test if this is actually correct
     template<typename T>
     bool remove(Entity entity)
     {
@@ -63,15 +79,21 @@ public:
 
         auto* pool = static_cast<ComponentPool<T>*>(it -> second.get());
 
+        if (!pool->has(entity))
+        {
+            return false;
+        }
+
         pool->remove(entity);
+        return true;
     }
 
     template<typename First, typename... Rest>
-    std::vector<Entity> getEntitiesWith()
+    std::vector<Entity> getEntitiesWith() const
     {
         std::vector<Entity> result;
 
-        ComponentPool<First>* firstPool = getPool<First>();
+        const ComponentPool<First>* firstPool = getPool<First>();
 
         if (firstPool == nullptr)
         {
@@ -121,6 +143,20 @@ private:
         }
 
         return static_cast<ComponentPool<T>*>(it->second.get());
+    }
+
+    template<typename T>
+    const ComponentPool<T>* getPool() const
+    {
+        const std::type_index type = typeid(T);
+        auto it = componentPools.find(type);
+
+        if (it == componentPools.end())
+        {
+            return nullptr;
+        }
+
+        return static_cast<const ComponentPool<T>*>(it->second.get());
     }
 
 

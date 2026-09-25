@@ -39,7 +39,7 @@ void RenderSystem::render(const RenderView& view, const LightingData& lightingDa
         shader.use();
 
         // View
-        shader.setMat4("model", transformComponent->getModelMatrix());
+        shader.setMat4("model", transformComponent->getWorldMatrix());
         shader.setMat4("view", view.view);
         shader.setMat4("projection", view.projection);
 

@@ -366,7 +366,7 @@ TEST_CASE("Identity quaternion does not affect model rotation")
     transform.rotation = Quaternion::identity();
     transform.scale = Vec3{1.0f, 1.0f, 1.0f};
 
-    Mat4 model = transform.getModelMatrix();
+    Mat4 model = transform.getLocalMatrix();
 
     Mat4 expected = Mat4::translate(transform.position);
 
@@ -381,7 +381,7 @@ TEST_CASE("Quaternion rotation contributes correctly to model matrix")
     transform.rotation = Quaternion::fromAxisAngle(Vec3{0.0f, 1.0f, 0.0f}, 90.0f);
     transform.scale = Vec3{1.0f, 1.0f, 1.0f};
 
-    Mat4 model = transform.getModelMatrix();
+    Mat4 model = transform.getLocalMatrix();
 
     Mat4 expected = Mat4::rotateY(90.0f);
 
