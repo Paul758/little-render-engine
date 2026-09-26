@@ -5,6 +5,7 @@
 #include "engine/systems/BehaviourTreeSystem.h"
 #include "engine/systems/HierarchySystem.h"
 #include "engine/systems/TransformSystem.h"
+#include "engine/assets/ModelInstantiator.h"
 
 #include "game/systems/PlayerInputSystem.h"
 #include "game/systems/IntentResetSystem.h"
@@ -43,7 +44,6 @@ private:
 
 private:
     Entity player_;
-    float hierarchyTestAngle = 0.0f;
     Entity gameCamera_;
     //Graphics resources
     std::unique_ptr<BasicMaterial> basicMaterial_;
@@ -52,7 +52,8 @@ private:
 
     //Assets
     AssetManager& assets_;
-    
+    ModelInstantiator modelInstantiator_;
+
     //ECS
     World world_;
 

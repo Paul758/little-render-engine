@@ -99,6 +99,7 @@ add_library(LittleRendererEngine STATIC
     engine/assets/AssetManager.cpp
     engine/assets/TextureLoader.cpp
     engine/assets/ModelLoader.cpp
+    engine/assets/ModelInstantiator.cpp
 
     # Components
     engine/components/TransformComponent.cpp
@@ -249,6 +250,8 @@ add_executable(
 
     tests/engine/assets/AssetManagerTest.cpp
     tests/engine/assets/ModelLoaderTest.cpp
+    tests/engine/assets/ModelInstantiatorTest.cpp
+
     tests/helpers/OpenGLTestContext.cpp
 
 

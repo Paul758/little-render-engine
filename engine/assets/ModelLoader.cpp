@@ -243,7 +243,7 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
 
                     const float* texCoord = reinterpret_cast<const float*>(vertexData);
 
-                    primitiveMeshData.vertices[i].texCoord = Vec2{texCoord[0], texCoord[1]};
+                    primitiveMeshData.vertices[i].texCoord = Vec2{texCoord[0], 1.0f - texCoord[1]};
                 }
             }
 

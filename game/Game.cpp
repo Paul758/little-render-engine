@@ -37,7 +37,8 @@ Game::Game(AssetManager& assets)
       integrationSystem_(world_.components()),
       fixedOrbitCameraSystem_(world_.components()),
       hierarchySystem_(world_.components()),
-      transformSystem_(world_.components(), hierarchySystem_)
+      transformSystem_(world_.components(), hierarchySystem_),
+      modelInstantiator_(world_, hierarchySystem_)
 {
 }
 
@@ -61,7 +62,7 @@ void Game::createScene()
     Texture2D& brick = assets_.loadTexture("textures/brick.png");
     basicMaterial_->albedoTexture = &brick;
 
-    Model& cubeModel = assets_.loadModel("models/cube.glb");
+    /* Model& cubeModel = assets_.loadModel("models/cube.glb");
     if (cubeModel.getMeshCount() == 0)
     {
         throw std::runtime_error("cube.glb contains no meshes");
@@ -79,13 +80,35 @@ void Game::createScene()
         Material& cubeMaterial = cubeModel.getMaterial(static_cast<std::size_t>(cubePrimitive.materialIndex));
         world_.components().add(cubeA, RenderComponent{&cubeMesh, &cubeMaterial});
         world_.components().add(cubeB, RenderComponent{&cubeMesh, &cubeMaterial});
-    }
+    }*/
+
+    Model& cubeModel = assets_.loadModel("models/cube.glb");
+    Entity cubeA = modelInstantiator_.instantiate(cubeModel);
+
+    Model& robotModel = assets_.loadModel("models/robot.glb");
+    Entity robot = modelInstantiator_.instantiate(robotModel);
+
+    TransformComponent robotTransform;
+    robotTransform.position = Vec3{5.0f, 0.0f, 5.0f};
+    robotTransform.rotation = Quaternion::fromAxisAngle(Vec3{0.0f, 1.0f, 0.0f}, 45.0f);
+    world_.components().add(robot, robotTransform);
+
+
+    Model& truckModel = assets_.loadModel("models/CesiumMilkTruck.glb");
+    Entity truck = modelInstantiator_.instantiate(truckModel);
+
+    TransformComponent truckTransform;
+    truckTransform.position = Vec3{-10.0f, 0.0f, -10.0f};
+    truckTransform.rotation = Quaternion::fromAxisAngle(Vec3{0.0f, 1.0f, 0.0f}, 45.0f);
+    world_.components().add(truck, truckTransform);
+
+    
 
     TransformComponent cubeATransform;
     cubeATransform.position = Vec3{-2.0f, 0.0f, -2.0f};
     world_.components().add(cubeA, cubeATransform);
 
-
+    // Sphere
     MeshData sphereData = PrimitiveMesh::sphere(8, 4);
     sphereMesh_ = std::make_unique<Mesh>(sphereData);
     
@@ -95,8 +118,6 @@ void Game::createScene()
 
     world_.components().add(sphereA, transformSphere);
     world_.components().add(sphereA, RenderComponent{sphereMesh_.get(), basicMaterial_.get()});
-    
-    hierarchySystem_.setParent(cubeA, player_);
 }
 
 void Game::createPlayer()
@@ -197,10 +218,6 @@ void Game::update(const Input& input, float deltaTime)
     integrationSystem_.update(deltaTime);
 
     fixedOrbitCameraSystem_.update(input, gameCamera_, deltaTime);
-
-    TransformComponent* playerTransform = world_.components().get<TransformComponent>(player_);
-    hierarchyTestAngle += deltaTime * 10.0f;
-    playerTransform->rotation = Quaternion::fromAxisAngle(Vec3{0.0f, 1.0f, 0.0f}, hierarchyTestAngle);
 
     transformSystem_.update();
 }

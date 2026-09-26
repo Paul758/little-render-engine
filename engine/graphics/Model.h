@@ -41,6 +41,9 @@ public:
     Material& getMaterial(std::size_t index);
     const Material& getMaterial(std::size_t index) const;
 
+    Material& resolveMaterial(int materialIndex);
+    const Material& resolveMaterial(int materialIndex) const;
+
     Texture2D& getTexture(std::size_t index);
     const Texture2D& getTexture(std::size_t index) const;
 
@@ -50,6 +53,8 @@ public:
     void setNodes(std::vector<NodeData> nodes);
     void setRootNodes(std::vector<std::size_t> rootNodes);
 
+    void setDefaultMaterial(std::unique_ptr<Material> material);
+
 private:
     std::vector<ModelMesh> meshes_;
     std::vector<std::unique_ptr<Material>> materials_;
@@ -57,4 +62,7 @@ private:
 
     std::vector<NodeData> nodes_;
     std::vector<std::size_t> rootNodes_;
+
+    std::unique_ptr<Material> defaultMaterial_;
+
 };

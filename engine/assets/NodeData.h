@@ -2,6 +2,7 @@
 
 #include "engine/math/Vec3.h"
 #include "engine/math/Quaternion.h"
+#include <vector>
 
 struct NodeData
 {

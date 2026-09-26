@@ -1,5 +1,6 @@
 
 #include <utility>
+#include <stdexcept>
 
 #include "engine/graphics/Model.h"
 #include "engine/graphics/Mesh.h"
@@ -56,6 +57,36 @@ const Material& Model::getMaterial(std::size_t index) const
      return *materials_.at(index);
 }
 
+Material& Model::resolveMaterial(int materialIndex)
+{
+    if (materialIndex == -1)
+    {
+        return *defaultMaterial_;
+    }
+
+    if (materialIndex < -1)
+    {
+        throw std::out_of_range("Invalid material index");
+    }
+
+    return getMaterial(static_cast<std::size_t>(materialIndex));
+}
+
+const Material& Model::resolveMaterial(int materialIndex) const
+{
+    if (materialIndex == -1)
+    {
+        return *defaultMaterial_;
+    }
+
+    if (materialIndex < -1)
+    {
+        throw std::out_of_range("Invalid material index");
+    }
+
+    return getMaterial(static_cast<std::size_t>(materialIndex));
+}
+
 Texture2D& Model::getTexture(std::size_t index)
 {
     return *textures_.at(index);
@@ -84,4 +115,9 @@ void Model::setNodes(std::vector<NodeData> nodes)
 void Model::setRootNodes(std::vector<std::size_t> rootNodes)
 {
     rootNodes_ = std::move(rootNodes);
+}
+
+void Model::setDefaultMaterial(std::unique_ptr<Material> material)
+{
+    defaultMaterial_ = std::move(material);
 }

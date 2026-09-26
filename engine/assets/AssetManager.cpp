@@ -103,6 +103,9 @@ Model& AssetManager::loadModel(const Path& path)
 
     auto model = std::make_unique<Model>();
 
+    model->setDefaultMaterial(std::make_unique<BasicMaterial>(shader));
+
+
     for (const TextureData& textureData : data.textures)
     {
         if (textureData.imageIndex < 0)
