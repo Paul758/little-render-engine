@@ -183,7 +183,7 @@ void Game::createCamera()
         10.0f
     };
 
-    CameraComponent camera{ProjectionType::Orthographic, 10.0f};
+    CameraComponent camera{ProjectionType::Orthographic, 20.0f};
 
     world_.components().add(gameCamera_, TransformComponent{});
     world_.components().add(gameCamera_, camera);

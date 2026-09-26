@@ -243,6 +243,8 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
 
                     const float* texCoord = reinterpret_cast<const float*>(vertexData);
 
+                    // The 1.0f - texCoord[1] is needed to convert glTF texture-coordinate orientation to the
+                    // texture-coordinate convention used by the renderer
                     primitiveMeshData.vertices[i].texCoord = Vec2{texCoord[0], 1.0f - texCoord[1]};
                 }
             }
