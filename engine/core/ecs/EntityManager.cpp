@@ -1,4 +1,5 @@
 #include "engine/core/ecs/EntityManager.h"
+#include <vector>
 
 Entity EntityManager::create()
 {
@@ -13,9 +14,15 @@ Entity EntityManager::create()
     {
         index = static_cast<std::uint32_t>(generations.size());
         generations.push_back(0);
+        entityToDenseIndex.push_back(0);
     }
 
-    return Entity{index, generations[index]};
+    Entity newEntity{index, generations[index]};
+    entityToDenseIndex[index] = aliveEntities.size();
+
+    aliveEntities.push_back(newEntity);
+
+    return newEntity;
 }
 
 void EntityManager::destroy(Entity entity)
@@ -24,6 +31,18 @@ void EntityManager::destroy(Entity entity)
     {
         return;
     }
+
+    const std::size_t removedIndex = entityToDenseIndex[entity.index];
+    const std::size_t lastIndex = aliveEntities.size() - 1;
+
+    if (removedIndex != lastIndex)
+    {
+        const Entity lastEntity = aliveEntities[lastIndex];
+        aliveEntities.at(removedIndex) = lastEntity;
+        entityToDenseIndex[lastEntity.index] = removedIndex;
+    }
+
+    aliveEntities.pop_back();
 
     ++generations[entity.index];
     freeIndices.push_back(entity.index);
@@ -37,4 +56,9 @@ bool EntityManager::isAlive(Entity entity) const
     }
 
     return generations[entity.index] == entity.generation;
+}
+
+const std::vector<Entity>& EntityManager::getAliveEntities() const
+{
+    return aliveEntities;
 }

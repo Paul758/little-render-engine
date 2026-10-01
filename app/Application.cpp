@@ -6,6 +6,10 @@
 #include <iostream>
 #include <memory>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include "engine/core/input/Input.h"
 #include "engine/core/time/GameTime.h"
 #include "game/Game.h"
@@ -15,7 +19,7 @@
 #include "engine/systems/LightingSystem.h"
 #include "engine/graphics/rendering/Renderer.h"
 
-#include "engine/editor/Editor.h"
+#include "app/editor/Editor.h"
 
 #include "engine/graphics/Framebuffer.h"
 #include "engine/graphics/rendering/ScreenRenderer.h"
@@ -82,10 +86,21 @@ bool Application::initialize()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_MULTISAMPLE);
 
-    //Assets
+    // Initialize ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window_, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
+    // Assets
     assetManager_ = std::make_unique<AssetManager>("assets");
 
-    //Initialize Input and Time
+    // Initialize Input and Time
     input_ = std::make_unique<Input>(window_);
     time_ = std::make_unique<GameTime>();
     game_ = std::make_unique<Game>(*assetManager_);
@@ -93,7 +108,7 @@ bool Application::initialize()
 
 
 
-    editor_ = std::make_unique<Editor>(game_->getWorld());
+    editor_ = std::make_unique<Editor>(game_->getWorld(), game_->getHiearchySystem());
     editor_->initialize();
 
     ComponentRegistry& components = game_->getWorld().components();
@@ -123,6 +138,14 @@ void Application::run()
         time_->update();
         input_->update();
 
+        // ImGui
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        editor_->drawGui();
+
+        // Game and editor update
         game_->update(*input_, time_->deltaTime());
         editor_->update(*input_, time_->deltaTime());
 
@@ -182,7 +205,11 @@ void Application::run()
             );
 
             glEnable(GL_DEPTH_TEST);
-        }
+        }     
+
+        // ImGui
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window_);
     }
@@ -207,6 +234,11 @@ Application::~Application()
 
     input_.reset();
     time_.reset();
+
+    // ImGui
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     if (window_ != nullptr)
     {

@@ -60,12 +60,34 @@ target_include_directories(glad
 )
 
 #--------------------
+# ImGui library
+#--------------------
+add_library(imgui STATIC
+    external/imgui/imgui.cpp
+    external/imgui/imgui_demo.cpp
+    external/imgui/imgui_draw.cpp
+    external/imgui/imgui_tables.cpp
+    external/imgui/imgui_widgets.cpp
+
+    external/imgui/backends/imgui_impl_glfw.cpp
+    external/imgui/backends/imgui_impl_opengl3.cpp
+)
+
+target_include_directories(imgui
+    PUBLIC
+        external/imgui
+        external/imgui/backends
+)
+
+target_link_libraries(imgui
+    PUBLIC
+        glfw
+)
+
+#--------------------
 # Engine library
 #--------------------
 add_library(LittleRendererEngine STATIC 
-
-    # Editor
-    engine/editor/Editor.cpp
 
     # Graphics
     engine/graphics/Shader.cpp
@@ -209,6 +231,7 @@ add_executable(
 
     app/main.cpp
     app/Application.cpp
+    app/editor/Editor.cpp
 )
 
 target_link_libraries(
@@ -216,6 +239,7 @@ target_link_libraries(
     PRIVATE
     LittleRendererEngine
     LittleRendererGame
+    imgui
 )
 
 #--------------------

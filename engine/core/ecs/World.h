@@ -8,6 +8,7 @@ public:
     void destroyEntity(Entity entity);
     bool isAlive(Entity entity) const;
     ComponentRegistry& components();
+    const std::vector<Entity>& getAliveEntities() const;
 
 private:
     ComponentRegistry componentRegistry;

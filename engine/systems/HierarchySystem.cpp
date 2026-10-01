@@ -18,7 +18,6 @@ void HierarchySystem::setParent(Entity child, Entity parent)
     if (wouldCreateCycle(child, parent))
     {
         throw std::invalid_argument("Cannot set parent: hierarchy cycle detected");
-        return;
     }
 
     ParentComponent* retrievedParent = registry_.get<ParentComponent>(child);
@@ -62,7 +61,7 @@ std::vector<Entity> HierarchySystem::getChildren(Entity parent) const
 
     for (Entity entity : entities)
     {
-        ParentComponent* retrievedParent = registry_.get<ParentComponent>(entity);
+        const ParentComponent* retrievedParent = registry_.get<ParentComponent>(entity);
         if (retrievedParent->parent == parent)
         {
             result.push_back(entity);

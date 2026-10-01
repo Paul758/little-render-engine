@@ -3,6 +3,7 @@
 #include "engine/components/TransformComponent.h"
 #include "engine/components/RenderComponent.h"
 #include "engine/components/BehaviourTreeComponent.h"
+#include "engine/components/NameComponent.h"
 
 #include "engine/components/camera/CameraComponent.h"
 #include "engine/components/camera/WorldCameraComponent.h"
@@ -92,7 +93,7 @@ void Game::createScene()
     robotTransform.position = Vec3{5.0f, 0.0f, 5.0f};
     robotTransform.rotation = Quaternion::fromAxisAngle(Vec3{0.0f, 1.0f, 0.0f}, 45.0f);
     world_.components().add(robot, robotTransform);
-
+    world_.components().add(robot, NameComponent{"Robot"});
 
     Model& truckModel = assets_.loadModel("models/CesiumMilkTruck.glb");
     Entity truck = modelInstantiator_.instantiate(truckModel);
@@ -101,12 +102,13 @@ void Game::createScene()
     truckTransform.position = Vec3{-10.0f, 0.0f, -10.0f};
     truckTransform.rotation = Quaternion::fromAxisAngle(Vec3{0.0f, 1.0f, 0.0f}, 45.0f);
     world_.components().add(truck, truckTransform);
-
+    world_.components().add(truck, NameComponent{"Milk Truck"});
     
 
     TransformComponent cubeATransform;
     cubeATransform.position = Vec3{-2.0f, 0.0f, -2.0f};
     world_.components().add(cubeA, cubeATransform);
+    world_.components().add(cubeA, NameComponent{"Cube"});
 
     // Sphere
     MeshData sphereData = PrimitiveMesh::sphere(8, 4);
@@ -118,6 +120,7 @@ void Game::createScene()
 
     world_.components().add(sphereA, transformSphere);
     world_.components().add(sphereA, RenderComponent{sphereMesh_.get(), basicMaterial_.get()});
+    world_.components().add(sphereA, NameComponent{"Sphere"});
 }
 
 void Game::createPlayer()
@@ -155,6 +158,7 @@ void Game::createPlayer()
     BehaviourTreeId treeId = behaviourTreeRegistry_.add(std::move(tree));
 
     world_.components().add(player_, BehaviourTreeComponent{treeId});
+    world_.components().add(player_, NameComponent{"Player"});
 }
 
 void Game::createCamera()
@@ -190,6 +194,8 @@ void Game::createCamera()
     world_.components().add(gameCamera_, WorldCameraComponent{});
     world_.components().add(gameCamera_, orbitCamera);
 
+    world_.components().add(gameCamera_, NameComponent{"Game Camera"});
+
 }
 
 void Game::createLight()
@@ -205,6 +211,7 @@ void Game::createLight()
 
     world_.components().add(sun, transform);
     world_.components().add(sun, light);
+    world_.components().add(sun, NameComponent{"Sun light"});
 }
 
 void Game::update(const Input& input, float deltaTime)
@@ -235,6 +242,11 @@ World& Game::getWorld()
 const World& Game::getWorld() const
 {
     return world_;
+}
+
+HierarchySystem& Game::getHiearchySystem()
+{
+    return hierarchySystem_;
 }
 
 Game::~Game() = default;

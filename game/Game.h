@@ -34,6 +34,8 @@ public:
     World& getWorld();
     const World& getWorld() const;
 
+    HierarchySystem& getHiearchySystem();
+
     Entity getCamera() const;
 
 private:

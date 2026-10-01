@@ -7,8 +7,6 @@ Input::Input(GLFWwindow* window) : window_(window)
 {
     glfwSetWindowUserPointer(window_, this);
     glfwSetScrollCallback(window_, scrollCallback);
-
-    glfwSetCursorPosCallback(window_, cursorPositionCallback);
 }
 
 void Input::update()
@@ -30,6 +28,23 @@ void Input::update()
     
     currentMouseButtons[static_cast<std::size_t>(MouseButton::Middle)] =
         glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
+
+    // Mouse position
+    double x;
+    double y;
+    glfwGetCursorPos(window_, &x, &y);
+
+    const Vec2 newPosition {static_cast<float>(x), static_cast<float>(y)};
+    if (!hasMousePosition)
+    {
+        mousePosition = newPosition;
+        hasMousePosition = true;
+    }
+    else
+    {
+        mouseDelta += newPosition - mousePosition;
+        mousePosition = newPosition;
+    }
 }
 
 bool Input::isKeyDown(int key) const
@@ -81,28 +96,6 @@ void Input::beginFrame()
 {
     scrollDelta = 0.0f;
     mouseDelta = Vec2{0.0f, 0.0f};
-}
-
-void Input::cursorPositionCallback(GLFWwindow* window, double x, double y)
-{
-    auto* input = static_cast<Input*>(glfwGetWindowUserPointer(window));
-
-    if (input == nullptr)
-    {
-        return;
-    }
-
-    Vec2 newPosition{static_cast<float>(x), static_cast<float>(y)};
-
-    if (!input->hasMousePosition)
-    {
-        input->mousePosition = newPosition;
-        input->hasMousePosition = true;
-        return;
-    }
-
-    input->mouseDelta += newPosition - input->mousePosition;
-    input->mousePosition = newPosition;
 }
 
 Vec2 Input::getMouseDelta() const

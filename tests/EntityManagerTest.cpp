@@ -44,3 +44,111 @@ TEST_CASE("EntityManager recognizes alive entities")
 
     CHECK(entityManager.isAlive(created1) == true);
 }
+
+TEST_CASE("EntityManager contains alive entities")
+{
+    EntityManager entityManager;
+
+    Entity a = entityManager.create();
+    Entity b = entityManager.create();
+    Entity c = entityManager.create();
+
+    const auto& alive = entityManager.getAliveEntities();
+
+    REQUIRE(alive.size() == 3);
+    REQUIRE(std::find(alive.begin(), alive.end(), a) != alive.end());
+    REQUIRE(std::find(alive.begin(), alive.end(), b) != alive.end());
+    REQUIRE(std::find(alive.begin(), alive.end(), c) != alive.end());
+
+}
+
+TEST_CASE("EntityManager removes destroyed entity from alive entities")
+{
+    EntityManager entityManager;
+
+    Entity a = entityManager.create();
+    Entity b = entityManager.create();
+    Entity c = entityManager.create();
+
+    entityManager.destroy(b);
+
+    const auto& alive = entityManager.getAliveEntities();
+
+    REQUIRE(alive.size() == 2);
+    REQUIRE(std::find(alive.begin(), alive.end(), a) != alive.end());
+    REQUIRE(std::find(alive.begin(), alive.end(), b) == alive.end());
+    REQUIRE(std::find(alive.begin(), alive.end(), c) != alive.end());
+
+}
+
+TEST_CASE("EntityManager lookup remains correct after swap removal")
+{
+    EntityManager entityManager;
+
+    Entity a = entityManager.create();
+    Entity b = entityManager.create();
+    Entity c = entityManager.create();
+
+    entityManager.destroy(b);
+    entityManager.destroy(c);
+
+    const auto& alive = entityManager.getAliveEntities();
+
+    REQUIRE(alive.size() == 1);
+    REQUIRE(alive[0] == a);
+
+    REQUIRE(entityManager.isAlive(a));
+    REQUIRE_FALSE(entityManager.isAlive(b));
+    REQUIRE_FALSE(entityManager.isAlive(c));
+}
+
+TEST_CASE("EntityManager reuses destroyed entity index with new generation")
+{
+    EntityManager entityManager;
+
+    Entity oldEntity = entityManager.create();
+    entityManager.destroy(oldEntity);
+
+    Entity newEntity = entityManager.create();
+
+    REQUIRE(newEntity.index == oldEntity.index);
+    REQUIRE(newEntity.generation != oldEntity.generation);
+
+    REQUIRE_FALSE(entityManager.isAlive(oldEntity));
+    REQUIRE(entityManager.isAlive(newEntity));
+
+    const auto& alive = entityManager.getAliveEntities();
+
+    REQUIRE(alive.size() == 1);
+    REQUIRE(alive[0] == newEntity);
+}
+
+TEST_CASE("EntityManager reamins correct after destruction and index reuse")
+{
+    EntityManager entityManager;
+
+    Entity a = entityManager.create();
+    Entity b = entityManager.create();
+    Entity c = entityManager.create();
+
+    entityManager.destroy(b);
+
+    Entity d = entityManager.create();
+
+    REQUIRE(d.index == b.index);
+    REQUIRE(d.generation != b.generation);
+
+    entityManager.destroy(c);
+
+    const auto& alive = entityManager.getAliveEntities();
+    
+    REQUIRE(alive.size() == 2);
+    REQUIRE(std::find(alive.begin(), alive.end(), a) != alive.end());
+    REQUIRE(std::find(alive.begin(), alive.end(), d) != alive.end());
+
+    REQUIRE(entityManager.isAlive(a));
+    REQUIRE(entityManager.isAlive(d));
+
+    REQUIRE_FALSE(entityManager.isAlive(b));
+    REQUIRE_FALSE(entityManager.isAlive(c));
+}
