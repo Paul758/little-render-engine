@@ -3,11 +3,15 @@
 #include "engine/assets/NodeData.h"
 #include "engine/graphics/Model.h"
 #include "engine/core/ecs/World.h"
+
 #include "engine/components/TransformComponent.h"
 #include "engine/components/RenderComponent.h"
+#include "engine/components/NameComponent.h"
+
 #include "engine/systems/HierarchySystem.h"
 
 #include <vector>
+#include <string>
 
 ModelInstantiator::ModelInstantiator(World& world, HierarchySystem& hierarchySystem)
     : world_(world), hierarchySystem_(hierarchySystem)
@@ -37,8 +41,12 @@ Entity ModelInstantiator::instantiateNode(const Model& model, std::size_t nodeIn
 {
     const NodeData& node = model.getNodes().at(nodeIndex);
 
-
     Entity entity = world_.createEntity();
+
+    if(!node.name.empty())
+    {
+        world_.components().add<NameComponent>(entity, NameComponent{node.name});
+    }
 
     TransformComponent transform;
     transform.position = node.translation;
@@ -51,9 +59,11 @@ Entity ModelInstantiator::instantiateNode(const Model& model, std::size_t nodeIn
     {
         const ModelMesh& mesh = model.getMesh(static_cast<std::size_t>(node.meshIndex));
 
-        for (const ModelPrimitive& primitive : mesh.primitives)
+        for (std::size_t i = 0; i < mesh.primitives.size(); ++i)
         {
-            instantiatePrimitive(model, primitive, entity);
+            const ModelPrimitive& primitive = mesh.primitives[i];
+
+            instantiatePrimitive(model, primitive, entity, i);
         }
     }
 
@@ -68,9 +78,11 @@ Entity ModelInstantiator::instantiateNode(const Model& model, std::size_t nodeIn
     return entity;
 }
 
-Entity ModelInstantiator::instantiatePrimitive(const Model& model, const ModelPrimitive& primitive, Entity nodeEntity)
+Entity ModelInstantiator::instantiatePrimitive(const Model& model, const ModelPrimitive& primitive, Entity nodeEntity, size_t index)
 {
     Entity entity = world_.createEntity();
+
+    world_.components().add<NameComponent>(entity, NameComponent{"Mesh Primitive " + std::to_string(index)});
 
     world_.components().add<TransformComponent>(entity, TransformComponent{});
 

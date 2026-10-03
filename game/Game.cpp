@@ -21,6 +21,7 @@
 #include "game/behaviour/player/PlayerMovementBTreeBuilder.h"
 #include "game/components/camera/FixedOrbitCameraComponent.h"
 #include "game/components/camera/OrbitPose.h"
+#include "game/components/HealthComponent.h"
 
 #include "engine/math/Vec3.h"
 
@@ -62,26 +63,6 @@ void Game::createScene()
     basicMaterial_->albedoColor = Vec3{1.0f, 1.0f, 1.0f};
     Texture2D& brick = assets_.loadTexture("textures/brick.png");
     basicMaterial_->albedoTexture = &brick;
-
-    /* Model& cubeModel = assets_.loadModel("models/cube.glb");
-    if (cubeModel.getMeshCount() == 0)
-    {
-        throw std::runtime_error("cube.glb contains no meshes");
-    }
-
-    Entity cubeA = world_.createEntity();
-    Entity cubeB = world_.createEntity();
-
-    ModelMesh& cubeModelMesh = cubeModel.getMesh(0);
-    ModelPrimitive& cubePrimitive = cubeModelMesh.primitives.at(0);
-
-    if (cubePrimitive.materialIndex >= 0)
-    {
-        Mesh& cubeMesh = *cubePrimitive.mesh;
-        Material& cubeMaterial = cubeModel.getMaterial(static_cast<std::size_t>(cubePrimitive.materialIndex));
-        world_.components().add(cubeA, RenderComponent{&cubeMesh, &cubeMaterial});
-        world_.components().add(cubeB, RenderComponent{&cubeMesh, &cubeMaterial});
-    }*/
 
     Model& cubeModel = assets_.loadModel("models/cube.glb");
     Entity cubeA = modelInstantiator_.instantiate(cubeModel);
@@ -159,6 +140,8 @@ void Game::createPlayer()
 
     world_.components().add(player_, BehaviourTreeComponent{treeId});
     world_.components().add(player_, NameComponent{"Player"});
+
+    world_.components().add(player_, HealthComponent{.currentHealth = 75.0f, .maxHealth = 100.0f});
 }
 
 void Game::createCamera()

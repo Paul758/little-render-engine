@@ -24,6 +24,11 @@ ComponentRegistry& World::components()
     return componentRegistry;
 }
 
+const ComponentRegistry& World::components() const
+{
+    return componentRegistry;
+}
+
 const std::vector<Entity>& World::getAliveEntities() const
 {
     return entityManager.getAliveEntities();

@@ -407,6 +407,9 @@ ModelData ModelLoader::load(const std::filesystem::path& path)
     for (const tinygltf::Node& gltfNode : gltfModel.nodes)
     {
         NodeData nodeData;
+
+        nodeData.name = gltfNode.name;
+
         nodeData.meshIndex = gltfNode.mesh;
 
         if (nodeData.meshIndex >= 0)

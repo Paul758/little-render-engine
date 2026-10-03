@@ -77,6 +77,36 @@ Quaternion Quaternion::fromEuler(const Vec3& rotationDegrees)
     return (zRotation * yRotation * xRotation).normalized();
 }
 
+Vec3 Quaternion::toEuler() const
+{
+    const Quaternion q = normalized();
+
+    // X rotation
+    const float sinXCosY = 2.0f * (q.w * q.x + q.y * q.z);
+    const float cosXCosY = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
+    const float x = std::atan2(sinXCosY, cosXCosY);
+
+    // Y rotation
+    const float sinY = 2.0f * (q.w * q.y - q.z * q.x);
+    float y;
+
+    if (std::abs(sinY >= 1.0f))
+    {
+        y = std::copysign(Math::PI / 2.0f, sinY);
+    }
+    else
+    {
+        y = std::asin(sinY);
+    }
+
+    // Z rotation
+    const float sinZCosY = 2.0f * (q.w * q.z + q.x * q.y);
+    const float cosZcosY = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
+    const float z = std::atan2(sinZCosY, cosZcosY);
+
+    return Vec3{Math::degrees(x), Math::degrees(y), Math::degrees(z)};
+}
+
 Quaternion Quaternion::lookRotation(const Vec3& forward, const Vec3& worldUp)
 {
     if (forward.lengthSquared() < 0.000001f)

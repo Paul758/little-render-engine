@@ -1,7 +1,7 @@
 #include <imgui.h>
 #include <cstdint>
 
-#include "app/editor/Editor.h"
+#include "editor/Editor.h"
 
 #include "engine/core/ecs/World.h"
 
@@ -9,7 +9,6 @@
 #include "engine/components/RenderComponent.h"
 #include "engine/components/camera/CameraComponent.h"
 #include "engine/components/camera/WorldCameraComponent.h"
-#include "engine/components/ParentComponent.h"
 #include "engine/components/NameComponent.h"
 
 #include "engine/systems/HierarchySystem.h"
@@ -18,8 +17,33 @@ Editor::Editor(World& world, HierarchySystem& hierarchySystem)
     : world_(world),
       hierarchySystem_(hierarchySystem),
       editorCameraInputSystem_(world_.components()),
-      editorCameraUpdateSystem_(world_.components())
+      editorCameraUpdateSystem_(world_.components()),
+      hierarchyPanel_(world_, hierarchySystem_),
+      inspectorPanel_(world_, componentEditorRegistry_)
 {
+    componentEditorRegistry_.registerEditor<TransformComponent>(
+        "Transform",
+        [this](TransformComponent& transform)
+        {
+            transformEditor_.draw(transform);
+        }
+    );
+
+    componentEditorRegistry_.registerEditor<CameraComponent>(
+        "Camera",
+        [this](CameraComponent& camera)
+        {
+            cameraEditor_.draw(camera);
+        }
+    );
+
+    componentEditorRegistry_.registerEditor<RenderComponent>(
+        "RenderComponent",
+        [this](RenderComponent& renderComponent)
+        {
+            renderComponentEditor_.draw(renderComponent);
+        }
+    );
 }
 
 Editor::~Editor() = default;
@@ -58,21 +82,8 @@ void Editor::update(Input& input, float deltaTime)
 
 void Editor::drawGui()
 {
-    
-    ImGui::Begin("Hierarchy");
-
-    ImGui::Text("WantCaptureMouse: %s", ImGui::GetIO().WantCaptureMouse ? "true" : "false");
-
-    for (Entity entity : world_.getAliveEntities())
-    {
-        if (hierarchySystem_.hasParent(entity))
-        {
-            continue;
-        }
-
-        drawEntityNode(entity);
-    }
-    ImGui::End();
+    hierarchyPanel_.draw(context_);
+    inspectorPanel_.draw(context_);
 }
 
 Entity Editor::getCamera() const
@@ -80,46 +91,7 @@ Entity Editor::getCamera() const
     return camera_;
 }
 
-void Editor::drawEntityNode(Entity entity)
+ComponentEditorRegistry& Editor::getComponentEditorRegistry()
 {
-    const auto children = hierarchySystem_.getChildren(entity);
-    const bool hasChildren = !children.empty();
-
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-
-    if (!hasChildren)
-    {
-        flags |= ImGuiTreeNodeFlags_Leaf;
-    }
-
-    const NameComponent* nameComponent = world_.components().get<NameComponent>(entity);
-    std::string label;
-
-    if (nameComponent != nullptr)
-    {
-        label = nameComponent->name;
-    }
-    else
-    {
-        label = "Entity " + std::to_string(entity.index);
-    }
-
-    const bool hasRender = world_.components().has<RenderComponent>(entity);
-    const bool hasCamera = world_.components().has<CameraComponent>(entity);
-
-    const bool open = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity.index)),
-       flags,
-       "%s",
-       label.c_str()
-        );
-
-    if (open)
-    {
-        for (Entity child : hierarchySystem_.getChildren(entity))
-        {
-            drawEntityNode(child);
-        }
-
-        ImGui::TreePop();
-    }
+    return componentEditorRegistry_;
 }

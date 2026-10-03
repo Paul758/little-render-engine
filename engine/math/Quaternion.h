@@ -27,6 +27,7 @@ public:
 
     static Quaternion fromAxisAngle(const Vec3& axis, float angleDegrees);
     static Quaternion fromEuler(const Vec3& rotationDegrees);
+    Vec3 toEuler() const;
     static Quaternion fromRotationMatrix(const Mat4& matrix);
     static Quaternion lookRotation(const Vec3& forward, const Vec3& up);
 

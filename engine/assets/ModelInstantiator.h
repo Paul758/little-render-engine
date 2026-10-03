@@ -16,7 +16,7 @@ public:
 
 private:
     Entity instantiateNode(const Model& modle, std::size_t nodeIndex);
-    Entity instantiatePrimitive(const Model& model, const ModelPrimitive& primitive, Entity nodeEntity);
+    Entity instantiatePrimitive(const Model& model, const ModelPrimitive& primitive, Entity nodeEntity, size_t index);
 
 private:
     World& world_;

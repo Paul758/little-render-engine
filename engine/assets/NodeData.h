@@ -3,9 +3,12 @@
 #include "engine/math/Vec3.h"
 #include "engine/math/Quaternion.h"
 #include <vector>
+#include <string>
 
 struct NodeData
 {
+    std::string name;
+
     int meshIndex = -1;
 
     Vec3 translation{0.0f, 0.0f, 0.0f};

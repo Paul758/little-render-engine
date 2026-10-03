@@ -149,6 +149,11 @@ add_library(LittleRendererEngine STATIC
 
     # TinyGltf
     engine/assets/TinyGltfImplementation.cpp
+
+    # Serialization
+    engine/serialization/ComponentSerializationRegistry.cpp
+    engine/serialization/EngineSerialization.cpp
+    engine/serialization/SerializationUtils.cpp
 )
 
 target_include_directories(
@@ -203,6 +208,7 @@ add_library(LittleRendererGame STATIC
     game/systems/IntentResetSystem.cpp
     game/systems/LocomotionSystem.cpp
     game/systems/PlayerInputSystem.cpp
+
 )
 
 
@@ -224,6 +230,58 @@ target_compile_definitions(LittleRendererGame
 )
 
 #--------------------
+# Editor library
+#--------------------
+add_library(LittleRendererEditor STATIC
+    editor/Editor.cpp
+
+    editor/ComponentEditorRegistry.cpp
+
+    editor/panels/HierarchyPanel.cpp
+    editor/panels/InspectorPanel.cpp
+
+    editor/component-editors/TransformEditor.cpp
+    editor/component-editors/CameraEditor.cpp
+    editor/component-editors/NameEditor.cpp
+    editor/component-editors/RenderComponentEditor.cpp
+
+
+)
+
+target_link_libraries(LittleRendererEditor
+    PUBLIC
+        LittleRendererEngine
+    PRIVATE
+        imgui
+)
+
+target_include_directories(LittleRendererEditor
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+#--------------------
+# Game Editor library
+#--------------------
+add_library(LittleRendererGameEditor STATIC
+    game-editor/GameEditor.cpp
+)
+
+target_link_libraries(LittleRendererGameEditor
+    PUBLIC
+        LittleRendererGame
+        LittleRendererEditor
+    PRIVATE
+        imgui
+
+)
+
+target_include_directories(LittleRendererGameEditor
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+#--------------------
 # Main executable
 #--------------------
 add_executable(
@@ -231,7 +289,6 @@ add_executable(
 
     app/main.cpp
     app/Application.cpp
-    app/editor/Editor.cpp
 )
 
 target_link_libraries(
@@ -239,6 +296,8 @@ target_link_libraries(
     PRIVATE
     LittleRendererEngine
     LittleRendererGame
+    LittleRendererEditor
+    LittleRendererGameEditor
     imgui
 )
 
@@ -275,6 +334,10 @@ add_executable(
     tests/engine/assets/AssetManagerTest.cpp
     tests/engine/assets/ModelLoaderTest.cpp
     tests/engine/assets/ModelInstantiatorTest.cpp
+
+    tests/engine/serialization/ComponentSerializationRegistryTest.cpp
+    tests/engine/serialization/SerializedValueTest.cpp
+    tests/engine/serialization/SerializationUtilsTest.cpp
 
     tests/helpers/OpenGLTestContext.cpp
 

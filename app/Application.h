@@ -14,6 +14,7 @@ class LightingSystem;
 class Renderer;
 
 class Editor;
+class GameEditor;
 
 class Framebuffer;
 class ScreenRenderer;
@@ -50,6 +51,7 @@ private:
     std::unique_ptr<ScreenRenderer> screenRenderer_;
 
     std::unique_ptr<Editor> editor_;
+    std::unique_ptr<GameEditor> gameEditor_;
     
     std::unique_ptr<AssetManager> assetManager_;
 };

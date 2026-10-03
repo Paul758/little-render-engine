@@ -13,13 +13,14 @@
 #include "engine/core/input/Input.h"
 #include "engine/core/time/GameTime.h"
 #include "game/Game.h"
+#include "game-editor/GameEditor.h"
 
 #include "engine/systems/RenderSystem.h"
 #include "engine/systems/CameraSystem.h"
 #include "engine/systems/LightingSystem.h"
 #include "engine/graphics/rendering/Renderer.h"
 
-#include "app/editor/Editor.h"
+#include "editor/Editor.h"
 
 #include "engine/graphics/Framebuffer.h"
 #include "engine/graphics/rendering/ScreenRenderer.h"
@@ -106,9 +107,11 @@ bool Application::initialize()
     game_ = std::make_unique<Game>(*assetManager_);
     game_->initialize();
 
-
-
     editor_ = std::make_unique<Editor>(game_->getWorld(), game_->getHiearchySystem());
+
+    gameEditor_ = std::make_unique<GameEditor>();
+    gameEditor_->registerComponentEditors(editor_->getComponentEditorRegistry());
+
     editor_->initialize();
 
     ComponentRegistry& components = game_->getWorld().components();

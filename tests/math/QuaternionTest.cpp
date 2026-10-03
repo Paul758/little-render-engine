@@ -203,3 +203,59 @@ TEST_CASE("lookRotation rotates forward to left")
     REQUIRE(result.y == Approx(0.0f).margin(0.0001f));
     REQUIRE(result.z == Approx(0.0f).margin(0.0001f));
 }
+
+TEST_CASE("Quaternion identity converts to zero Euler rotation")
+{
+    const Quaternion q = Quaternion::identity();
+
+    const Vec3 euler = q.toEuler();
+
+    REQUIRE(euler.x == Catch::Approx(0.0f).margin(0.00001f));
+    REQUIRE(euler.y == Catch::Approx(0.0f).margin(0.00001f));
+    REQUIRE(euler.z == Catch::Approx(0.0f).margin(0.00001f));
+}
+
+TEST_CASE("Quaternion X rotation converts to Euler angles")
+{
+    const Quaternion q = Quaternion::fromEuler(Vec3{30.0f, 0.0f, 0.0f});
+
+    const Vec3 euler = q.toEuler();
+
+    REQUIRE(euler.x == Catch::Approx(30.0f).margin(0.001f));
+    REQUIRE(euler.y == Catch::Approx(0.0f).margin(0.001f));
+    REQUIRE(euler.z == Catch::Approx(0.0f).margin(0.001f));
+}
+
+TEST_CASE("Quaternion Y rotation converts to Euler angles")
+{
+    const Quaternion q = Quaternion::fromEuler(Vec3{0.0f, 30.0f, 0.0f});
+
+    const Vec3 euler = q.toEuler();
+
+    REQUIRE(euler.x == Catch::Approx(0.0f).margin(0.001f));
+    REQUIRE(euler.y == Catch::Approx(30.0f).margin(0.001f));
+    REQUIRE(euler.z == Catch::Approx(0.0f).margin(0.001f));
+}
+
+TEST_CASE("Quaternion Z rotation converts to Euler angles")
+{
+    const Quaternion q = Quaternion::fromEuler(Vec3{0.0f, 0.0f, 30.0f});
+
+    const Vec3 euler = q.toEuler();
+
+    REQUIRE(euler.x == Catch::Approx(0.0f).margin(0.001f));
+    REQUIRE(euler.y == Catch::Approx(0.0f).margin(0.001f));
+    REQUIRE(euler.z == Catch::Approx(30.0f).margin(0.001f));
+}
+
+TEST_CASE("Quaternion converts between Euler angles")
+{
+    const Vec3 original{20.0f, 30.0f, 40.0f};
+
+    const Quaternion q = Quaternion::fromEuler(original);
+    const Vec3 result = q.toEuler();
+
+    REQUIRE(result.x == Catch::Approx(original.x).margin(0.001f));
+    REQUIRE(result.y == Catch::Approx(original.y).margin(0.001f));
+    REQUIRE(result.z == Catch::Approx(original.z).margin(0.001f));
+}
