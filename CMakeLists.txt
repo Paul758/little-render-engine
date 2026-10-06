@@ -48,6 +48,17 @@ FetchContent_MakeAvailable(Catch2)
 enable_testing()
 
 #--------------------
+# JSON
+#--------------------
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.12.0
+)
+
+FetchContent_MakeAvailable(nlohmann_json)
+
+#--------------------
 # Glad
 #--------------------
 add_library(glad STATIC
@@ -154,6 +165,10 @@ add_library(LittleRendererEngine STATIC
     engine/serialization/ComponentSerializationRegistry.cpp
     engine/serialization/EngineSerialization.cpp
     engine/serialization/SerializationUtils.cpp
+
+    # Scene
+    engine/scene/SceneSerializer.cpp
+    engine/scene/SceneJson.cpp
 )
 
 target_include_directories(
@@ -172,6 +187,7 @@ target_link_libraries(LittleRendererEngine
     PUBLIC
         glad
         glfw
+        nlohmann_json::nlohmann_json
 )
 
 target_compile_definitions(LittleRendererEngine
@@ -208,6 +224,9 @@ add_library(LittleRendererGame STATIC
     game/systems/IntentResetSystem.cpp
     game/systems/LocomotionSystem.cpp
     game/systems/PlayerInputSystem.cpp
+
+    # Serialization
+    game/serialization/GameSerialization.cpp
 
 )
 
@@ -338,6 +357,11 @@ add_executable(
     tests/engine/serialization/ComponentSerializationRegistryTest.cpp
     tests/engine/serialization/SerializedValueTest.cpp
     tests/engine/serialization/SerializationUtilsTest.cpp
+
+    tests/engine/scene/SceneSerializerTest.cpp
+    tests/engine/scene/SceneJsonTest.cpp
+
+    tests/game/GameSerializationTest.cpp
 
     tests/helpers/OpenGLTestContext.cpp
 

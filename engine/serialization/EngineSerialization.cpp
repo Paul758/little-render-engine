@@ -2,8 +2,13 @@
 
 #include "engine/serialization/ComponentSerializationRegistry.h"
 #include "engine/serialization/SerializationUtils.h"
+#include "engine/serialization/SerializationContext.h"
+#include "engine/serialization/DeserializationContext.h"
+
 #include "engine/components/NameComponent.h"
 #include "engine/components/TransformComponent.h"
+#include "engine/components/ParentComponent.h"
+
 
 void EngineSerialization::registerComponents(ComponentSerializationRegistry& registry)
 {
@@ -51,6 +56,29 @@ void EngineSerialization::registerComponents(ComponentSerializationRegistry& reg
             transform.scale = SerializationUtils::deserializeVec3(object.at("Scale"));
             
             return transform;
+        }
+    );
+
+    registry.registerComponentWithContext<ParentComponent>(
+        "Parent",
+
+        [](const ParentComponent& parent, const SerializationContext& context)
+        {
+            SceneEntityId parentId = context.getSceneEntityId(parent.parent);
+            SerializedValue::Object object;
+
+            object["parent"] = SerializedValue{parentId};
+
+            return SerializedValue{std::move(object)};
+        },
+
+        [](const SerializedValue& value, const DeserializationContext& context)
+        {
+            const auto& object = value.get<SerializedValue::Object>();
+            
+            const SceneEntityId parentId = object.at("parent").get<std::uint64_t>();
+
+            return ParentComponent{context.getEntity(parentId)};
         }
     );
 }

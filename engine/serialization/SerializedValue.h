@@ -6,6 +6,7 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <cstdint>
 
 class SerializedValue
 {
@@ -13,7 +14,7 @@ public:
     using Array = std::vector<SerializedValue>;
     using Object = std::map<std::string, SerializedValue>;
 
-    using Value = std::variant<std::nullptr_t, bool, double, std::string, Array, Object>;
+    using Value = std::variant<std::nullptr_t, bool, double, std::uint64_t, std::string, Array, Object>;
 
     SerializedValue()
         : value_(nullptr)
@@ -26,6 +27,11 @@ public:
     }
 
     SerializedValue(double value)
+        : value_(value)
+    {
+    }
+
+    SerializedValue(uint64_t value)
         : value_(value)
     {
     }

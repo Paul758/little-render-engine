@@ -6,6 +6,8 @@
 #include "engine/components/NameComponent.h"
 #include "engine/components/TransformComponent.h"
 #include "engine/math/Vec3.h"
+#include "engine/serialization/SerializationContext.h"
+#include "engine/serialization/DeserializationContext.h"
 
 namespace
 {
@@ -42,11 +44,13 @@ TEST_CASE("ComponentSerializationRegistry returns registered components present 
         }
     );
 
+    SerializationContext context;
+
     Entity entity = world.createEntity();
 
     world.components().add(entity, PositionComponent{42.0f});
 
-    const SerializedValue serialized = registry.serializeComponents(world, entity);
+    const SerializedValue serialized = registry.serializeComponents(world, entity, context);
     REQUIRE(serialized.is<SerializedValue::Object>());
 
     const auto& components = serialized.get<SerializedValue::Object>();
@@ -83,17 +87,22 @@ TEST_CASE("ComponentSerializationRegistry round trips a component")
         }
     );
 
+    SerializationContext context;    
+
     Entity source = world.createEntity();
 
     world.components().add(source, PositionComponent{42.0f});
 
-    const SerializedValue serialized = registry.serializeComponents(world, source);
+    const SerializedValue serialized = registry.serializeComponents(world, source, context);
 
     Entity destination = world.createEntity();
 
+    DeserializationContext deserializationContext;
+    deserializationContext.registerEntity(1, destination);
+
     REQUIRE_FALSE(world.components().has<PositionComponent>(destination));
 
-    registry.deserializeComponents(world, destination, serialized);
+    registry.deserializeComponents(world, destination, serialized, deserializationContext);
 
     const PositionComponent* position = world.components().get<PositionComponent>(destination);
 
@@ -106,17 +115,23 @@ TEST_CASE("Engine serialization round trips NameComponent")
     World world;
     ComponentSerializationRegistry registry;
 
+    SerializationContext context;
+
+
     EngineSerialization::registerComponents(registry);
 
     Entity source = world.createEntity();
 
     world.components().add(source, NameComponent{"Player"});
 
-    const SerializedValue serialized = registry.serializeComponents(world, source);
+    const SerializedValue serialized = registry.serializeComponents(world, source, context);
 
     Entity destination = world.createEntity();
 
-    registry.deserializeComponents(world, destination, serialized);
+    DeserializationContext deserializationContext;
+    deserializationContext.registerEntity(1, destination);
+
+    registry.deserializeComponents(world, destination, serialized, deserializationContext);
 
     const NameComponent* name = world.components().get<NameComponent>(destination);
 
@@ -131,6 +146,8 @@ TEST_CASE("Engine serialization round trips TransformComponent")
 
     EngineSerialization::registerComponents(registry);
 
+    SerializationContext context;
+
     Entity source = world.createEntity();
 
     TransformComponent transform;
@@ -140,13 +157,16 @@ TEST_CASE("Engine serialization round trips TransformComponent")
 
     world.components().add(source, transform);
 
-    const SerializedValue serialized = registry.serializeComponents(world, source);
+    const SerializedValue serialized = registry.serializeComponents(world, source, context);
 
     Entity destination = world.createEntity();
 
+    DeserializationContext deserializationContext;
+    deserializationContext.registerEntity(1, destination);
+
     REQUIRE_FALSE(world.components().has<TransformComponent>(destination));
 
-    registry.deserializeComponents(world, destination, serialized);
+    registry.deserializeComponents(world, destination, serialized, deserializationContext);
 
     const TransformComponent* transformResult = world.components().get<TransformComponent>(destination);
 
