@@ -169,6 +169,8 @@ add_library(LittleRendererEngine STATIC
     # Scene
     engine/scene/SceneSerializer.cpp
     engine/scene/SceneJson.cpp
+    engine/scene/SceneFile.cpp
+    engine/scene/SceneService.cpp
 )
 
 target_include_directories(
@@ -360,6 +362,8 @@ add_executable(
 
     tests/engine/scene/SceneSerializerTest.cpp
     tests/engine/scene/SceneJsonTest.cpp
+    tests/engine/scene/SceneFileTest.cpp
+    tests/engine/scene/SceneServiceTest.cpp
 
     tests/game/GameSerializationTest.cpp
 

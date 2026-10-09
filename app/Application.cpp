@@ -20,6 +20,9 @@
 #include "engine/systems/LightingSystem.h"
 #include "engine/graphics/rendering/Renderer.h"
 
+#include "engine/serialization/EngineSerialization.h"
+#include "game/serialization/GameSerialization.h"
+
 #include "editor/Editor.h"
 
 #include "engine/graphics/Framebuffer.h"
@@ -100,6 +103,17 @@ bool Application::initialize()
 
     // Assets
     assetManager_ = std::make_unique<AssetManager>("assets");
+
+    //Scene
+    registry_ = std::make_unique<ComponentSerializationRegistry>();
+
+    // Initialize Serialization
+    EngineSerialization::registerComponents(*registry_);
+    GameSerialization::registerComponents(*registry_);
+
+    sceneService_ = std::make_unique<SceneService>(*registry_);
+
+
 
     // Initialize Input and Time
     input_ = std::make_unique<Input>(window_);
@@ -237,6 +251,9 @@ Application::~Application()
 
     input_.reset();
     time_.reset();
+
+    sceneService_.reset();
+    registry_.reset();
 
     // ImGui
     ImGui_ImplOpenGL3_Shutdown();

@@ -14,5 +14,6 @@ public:
     static SceneData deserialize(const std::string& json);
 
 private:
-    static json serializeComponents(const SerializedValue& components);
+    static json toJson(const SerializedValue& value);
+    static SerializedValue fromJson(const json& jsonString);
 };

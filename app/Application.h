@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include "engine/serialization/ComponentSerializationRegistry.h"
+#include "engine/scene/SceneService.h"
+
 struct GLFWwindow;
 
 class Input;
@@ -21,6 +24,10 @@ class ScreenRenderer;
 
 class ShaderProgram;
 class AssetManager;
+
+class SceneService;
+class SceneSerializer;
+class ComponentSerializationRegistry;
 
 class Application
 {
@@ -54,4 +61,8 @@ private:
     std::unique_ptr<GameEditor> gameEditor_;
     
     std::unique_ptr<AssetManager> assetManager_;
+
+    // Scene loading
+    std::unique_ptr<ComponentSerializationRegistry> registry_;
+    std::unique_ptr<SceneService> sceneService_;
 };
